@@ -1,0 +1,229 @@
+datasource db {
+  provider = "postgresql"
+  url      = env("DATABASE_URL")
+}
+
+generator client {
+  provider = "prisma-client-js"
+}
+
+enum Role {
+  STUDENT
+  PLATFORM_ADMIN
+  SUPER_ADMIN
+}
+
+enum Gender {
+  MALE
+  FEMALE
+}
+
+enum AccountStatus {
+  ACTIVE
+  DISABLED
+  PENDING_VERIFICATION
+}
+
+enum SyncStatus {
+  PENDING
+  IN_PROGRESS
+  SUCCESS
+  FAILED
+  STALE
+}
+
+enum PlatformType {
+  LEETCODE
+}
+
+model User {
+  id                  String         @id @default(uuid())
+  email               String         @unique
+  passwordHash        String
+  role                Role           @default(STUDENT)
+  status              AccountStatus  @default(PENDING_VERIFICATION)
+  emailVerified       DateTime?
+
+  failedLoginAttempts Int            @default(0)
+  lockedUntil         DateTime?
+
+  profile             UserProfile?
+  codingAccounts      LinkedCodingAccount[]
+  achievements        UserAchievement[]
+
+  accounts            Account[]
+  sessions            Session[]
+
+  createdAt           DateTime       @default(now())
+  updatedAt           DateTime       @updatedAt
+
+  @@index([email])
+  @@index([status])
+  @@index([role])
+}
+
+model UserProfile {
+  id               String   @id @default(uuid())
+  userId           String   @unique
+  user             User     @relation(fields: [userId], references: [id], onDelete: Cascade)
+
+  displayName      String
+  gender           Gender
+  leetcodeUsername String
+  admissionYear    Int?
+  graduationYear   Int?
+  branch           String?
+  avatarUrl        String?
+  bio              String?  @db.VarChar(300)
+
+  collegeRank      Int?
+  weightedScore    Float?   @default(0.0)
+
+  createdAt        DateTime @default(now())
+  updatedAt        DateTime @updatedAt
+
+  @@index([gender])
+  @@index([collegeRank])
+  @@index([weightedScore(sort: Desc)])
+  @@index([branch])
+  @@index([admissionYear])
+  @@index([graduationYear])
+}
+
+model LinkedCodingAccount {
+  id            String              @id @default(uuid())
+  userId        String
+  user          User                @relation(fields: [userId], references: [id], onDelete: Cascade)
+  platform      PlatformType        @default(LEETCODE)
+  username      String
+  isVerified    Boolean             @default(false)
+  syncStatus    SyncStatus          @default(PENDING)
+  lastSyncAt    DateTime?
+  lastSyncError String?
+  statistics    CodingStatistics?
+  submissions   SubmissionHistory[]
+
+  createdAt     DateTime            @default(now())
+  updatedAt     DateTime            @updatedAt
+
+  @@unique([platform, username])
+  @@unique([userId, platform])
+  @@index([userId])
+  @@index([lastSyncAt])
+}
+
+model CodingStatistics {
+  id                     String              @id @default(uuid())
+  accountId              String              @unique
+  account                LinkedCodingAccount @relation(fields: [accountId], references: [id], onDelete: Cascade)
+  totalSolved            Int                 @default(0)
+  easySolved             Int                 @default(0)
+  mediumSolved           Int                 @default(0)
+  hardSolved             Int                 @default(0)
+  acceptanceRate         Float               @default(0.0)
+  contestRating          Float?
+  highestContestRating   Float?
+  longestStreak          Int                 @default(0)
+  globalContestRank      Int?
+  contestsAttended       Int                 @default(0)
+  submissionCalendarJson String?             @db.Text
+  updatedAt              DateTime            @updatedAt
+
+  @@index([totalSolved(sort: Desc)])
+}
+
+model SubmissionHistory {
+  id          String              @id @default(uuid())
+  accountId   String
+  account     LinkedCodingAccount @relation(fields: [accountId], references: [id], onDelete: Cascade)
+  title       String
+  titleSlug   String
+  timestamp   DateTime
+  status      String
+  lang        String
+  createdAt   DateTime            @default(now())
+
+  @@index([accountId, timestamp(sort: Desc)])
+  @@unique([accountId, titleSlug, timestamp])
+}
+
+model Account {
+  id                String  @id @default(uuid())
+  userId            String
+  type              String
+  provider          String
+  providerAccountId String
+  refresh_token     String? @db.Text
+  access_token      String? @db.Text
+  expires_at        Int?
+  token_type        String?
+  scope             String?
+  id_token          String? @db.Text
+  session_state     String?
+
+  user User @relation(fields: [userId], references: [id], onDelete: Cascade)
+
+  @@unique([provider, providerAccountId])
+}
+
+model Session {
+  id           String   @id @default(uuid())
+  sessionToken String   @unique
+  userId       String
+  expires      DateTime
+  user         User     @relation(fields: [userId], references: [id], onDelete: Cascade)
+}
+
+model VerificationToken {
+  id        String   @id @default(uuid())
+  email     String
+  token     String   @unique
+  type      String   @default("EMAIL_VERIFICATION")
+  expires   DateTime
+  createdAt DateTime @default(now())
+
+  @@unique([email, token])
+  @@index([email, type])
+}
+model Achievement {
+  id                  String            @id @default(uuid())
+  name                String            @unique
+  slug                String            @unique
+  description         String
+  category            String            @default("GENERAL")
+  iconKey             String            @default("trophy")
+  conditionExpression String
+  rarityLevel         String            @default("COMMON")
+  points              Int               @default(10)
+  status              String            @default("PUBLISHED")
+  recipients          UserAchievement[]
+  createdAt           DateTime          @default(now())
+  updatedAt           DateTime          @updatedAt
+
+  @@index([category])
+  @@index([status])
+}
+
+model UserAchievement {
+  id            String       @id @default(uuid())
+  userId        String
+  user          User         @relation(fields: [userId], references: [id], onDelete: Cascade)
+  achievementId String?
+  achievement   Achievement? @relation(fields: [achievementId], references: [id], onDelete: SetNull)
+  name          String
+  description   String?
+  iconKey       String?
+  category      String?
+  unlockedAt    DateTime     @default(now())
+  isRevoked     Boolean      @default(false)
+  revokedAt     DateTime?
+  isFeatured    Boolean      @default(false)
+  isLegacy      Boolean      @default(false)
+
+  createdAt     DateTime     @default(now())
+  updatedAt     DateTime     @updatedAt
+
+  @@unique([userId, achievementId])
+  @@index([userId])
+  @@index([achievementId])
+}

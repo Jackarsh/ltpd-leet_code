@@ -1,0 +1,57 @@
+﻿import { auth } from "@/lib/auth";
+import { NextResponse } from "next/server";
+
+// Public routes that don't require authentication
+const publicRoutes = [
+  "/",
+  "/auth/login",
+  "/auth/register",
+  "/auth/verify-email",
+  "/auth/forgot-password",
+  "/auth/new-password",
+  "/auth/error",
+  "/profiles",
+];
+
+const publicPrefixes = [
+  "/api/auth",
+  "/profiles/",
+];
+
+export default auth((req) => {
+  const { nextUrl } = req;
+  const isLoggedIn = !!req.auth;
+  const pathname = nextUrl.pathname;
+
+  // Allow public routes
+  const isPublicRoute = publicRoutes.includes(pathname);
+  const isPublicPrefix = publicPrefixes.some((prefix) => pathname.startsWith(prefix));
+  const isApiRoute = pathname.startsWith("/api/");
+
+  if (isPublicRoute || isPublicPrefix) {
+    // Redirect logged-in users away from auth pages
+    if (isLoggedIn && pathname.startsWith("/auth/")) {
+      return NextResponse.redirect(new URL("/dashboard", nextUrl));
+    }
+    return NextResponse.next();
+  }
+
+  // Allow API routes (they handle their own auth)
+  if (isApiRoute) {
+    return NextResponse.next();
+  }
+
+  // Redirect unauthenticated users to login
+  if (!isLoggedIn) {
+    const callbackUrl = encodeURIComponent(pathname);
+    return NextResponse.redirect(
+      new URL("/auth/login?callbackUrl=" + callbackUrl, nextUrl)
+    );
+  }
+
+  return NextResponse.next();
+});
+
+export const config = {
+  matcher: ["/((?!_next/static|_next/image|favicon.ico|public/).*)"],
+};
