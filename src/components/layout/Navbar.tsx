@@ -2,7 +2,7 @@
 
 import Link from "next/link";
 import { useSession, signOut } from "next-auth/react";
-import { LogOut, Settings, BarChart3, Trophy } from "lucide-react";
+import { LogOut, Settings, BarChart3, Trophy, Swords, Share2 } from "lucide-react";
 
 export function Navbar() {
   const { data: session, status } = useSession();
@@ -26,6 +26,14 @@ export function Navbar() {
             <Trophy className="h-4 w-4 text-amber-400" />
             <span>Leaderboard</span>
           </Link>
+
+          <Link
+            href="/gender-war"
+            className="flex items-center gap-1.5 text-sm font-medium text-zinc-300 hover:text-indigo-400 transition-colors"
+          >
+            <Swords className="h-4 w-4 text-indigo-400" />
+            <span>Gender War</span>
+          </Link>
         </div>
 
         <div className="flex items-center gap-4">
@@ -33,6 +41,13 @@ export function Navbar() {
             <>
               <Link href="/dashboard" className="text-sm text-zinc-400 hover:text-zinc-100 transition-colors">
                 Dashboard
+              </Link>
+              <Link
+                href="/studio/card"
+                className="flex items-center gap-1.5 text-sm text-zinc-400 hover:text-indigo-400 transition-colors"
+              >
+                <Share2 className="h-4 w-4 text-indigo-400" />
+                <span>Card Studio</span>
               </Link>
               <Link href="/settings/profile" className="text-zinc-400 hover:text-zinc-100 transition-colors">
                 <Settings className="h-5 w-5" />

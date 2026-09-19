@@ -89,6 +89,13 @@ Do not perform unrelated refactoring.
 
 Do not introduce abstractions solely to satisfy a design principle.
 
+## UI/UX Frontend Craftsmanship
+
+Avoid generic, bland, or visibly AI-generated UI designs.
+- Implement thoughtful color palettes, consistent typography, responsive spacing, and polished states (hover, focus, active, empty, loading, error).
+- Include meaningful micro-interactions and smooth transitions.
+- At the conclusion of every feature (not after each individual phase), conduct an interactive UI/UX review with the user to gather and apply styling and usability recommendations.
+
 ## Completion
 
 Before declaring implementation complete:
@@ -100,3 +107,4 @@ Before declaring implementation complete:
 - verify against the active specification
 - verify security/privacy requirements
 - verify no unnecessary complexity was introduced
+- execute interactive UI/UX review task at feature completion when frontend surfaces were modified
