@@ -6,7 +6,8 @@
     "dev": "next dev",
     "build": "next build",
     "start": "next start",
-    "lint": "eslint"
+    "lint": "eslint",
+    "seed:admin": "npx tsx scripts/create-super-admin.ts"
   },
   "dependencies": {
     "@auth/prisma-adapter": "^2.11.3",
