@@ -50,6 +50,8 @@ model User {
   profile             UserProfile?
   codingAccounts      LinkedCodingAccount[]
   achievements        UserAchievement[]
+  cardConfig          ProfileCardConfig?
+  auditLogs           AuditLog[]            @relation("AdminAuditActions")
 
   accounts            Account[]
   sessions            Session[]
@@ -60,6 +62,7 @@ model User {
   @@index([email])
   @@index([status])
   @@index([role])
+  @@index([role, status])
 }
 
 model UserProfile {
@@ -110,6 +113,7 @@ model LinkedCodingAccount {
   @@unique([userId, platform])
   @@index([userId])
   @@index([lastSyncAt])
+  @@index([syncStatus, lastSyncAt])
 }
 
 model CodingStatistics {
@@ -226,4 +230,117 @@ model UserAchievement {
   @@unique([userId, achievementId])
   @@index([userId])
   @@index([achievementId])
+  @@index([userId, isRevoked])
 }
+
+// R5 — Gender War aggregate metrics per gender group per time window.
+// periodId is a plain string reference to an AcademicPeriod (defined in R7).
+// Kept as a string to avoid a hard schema dependency on R7 infrastructure.
+model GenderWarAggregate {
+  id                     String   @id @default(uuid())
+  gender                 Gender
+  // "CURRENT_WEEK" | "CURRENT_MONTH" | "SEMESTER" | "ACADEMIC_YEAR" | "ALL_TIME"
+  timeWindow             String
+  // Optional reference to an academic period (R7). Stored as string to avoid R7 dependency.
+  periodId               String?
+
+  participantCount       Int      @default(0)
+  totalSolved            Int      @default(0)
+  avgSolvedPerStudent    Float    @default(0.0)
+  totalHard              Int      @default(0)
+  avgHardPerStudent      Float    @default(0.0)
+  totalMedium            Int      @default(0)
+  avgMediumPerStudent    Float    @default(0.0)
+  totalEasy              Int      @default(0)
+  avgEasyPerStudent      Float    @default(0.0)
+  totalContestsAttended  Int      @default(0)
+  avgContestsPerStudent  Float    @default(0.0)
+  // Number of participants who have a confirmed contest rating
+  ratedParticipantCount  Int      @default(0)
+  avgContestRating       Float?
+  // Participants with >=1 accepted submission or >=1 contest in the window
+  activeCodersCount      Int      @default(0)
+  // Total accepted submissions in the selected time window
+  recentSubmissionsCount Int      @default(0)
+  // Average current streak across all participants
+  avgStreakDays          Float    @default(0.0)
+  // True when active participant count < 5
+  isLowSampleSize        Boolean  @default(false)
+  // True when any participant's sync data is stale (>24h old)
+  hasStaleData           Boolean  @default(false)
+  // Count of participants with no successful sync yet
+  pendingDataCount       Int      @default(0)
+
+  computedAt             DateTime @default(now())
+
+  @@unique([gender, timeWindow, periodId])
+  @@index([gender])
+  @@index([timeWindow])
+  @@index([computedAt])
+}
+
+model ProfileCardConfig {
+  id               String   @id @default(uuid())
+  userId           String   @unique
+  user             User     @relation(fields: [userId], references: [id], onDelete: Cascade)
+  cardToken        String   @unique @default(uuid())
+  theme            String   @default("github-dark")
+  layout           String   @default("standard")
+  showStreak       Boolean  @default(true)
+  showRating       Boolean  @default(true)
+  showAchievements Boolean  @default(true)
+  featuredBadgeIds String[]
+  createdAt        DateTime @default(now())
+  updatedAt        DateTime @updatedAt
+
+  @@index([cardToken])
+}
+
+// R7 — Immutable Administrative Audit Log
+model AuditLog {
+  id          String   @id @default(uuid())
+  adminUserId String
+  adminUser   User     @relation("AdminAuditActions", fields: [adminUserId], references: [id], onDelete: Restrict)
+  actionType  String
+  targetType  String
+  targetId    String
+  beforeState Json?
+  afterState  Json?
+  ipAddress   String?
+  userAgent   String?
+  createdAt   DateTime @default(now())
+
+  @@index([adminUserId, createdAt])
+  @@index([actionType, createdAt])
+  @@index([targetType, targetId])
+  @@index([createdAt])
+}
+
+// R7 — Academic Period Configuration (Semesters & Academic Years)
+model AcademicPeriod {
+  id         String   @id @default(uuid())
+  name       String
+  periodType String   // "SEMESTER" | "ACADEMIC_YEAR"
+  startDate  DateTime
+  endDate    DateTime
+  isCurrent  Boolean  @default(false)
+  createdAt  DateTime @default(now())
+  updatedAt  DateTime @updatedAt
+
+  @@index([isCurrent])
+  @@index([periodType])
+}
+
+// R7 — Academic Branch Configuration
+model AcademicBranch {
+  id           String   @id @default(uuid())
+  name         String   @unique
+  code         String   @unique
+  isActive     Boolean  @default(true)
+  displayOrder Int      @default(0)
+  createdAt    DateTime @default(now())
+  updatedAt    DateTime @updatedAt
+
+  @@index([isActive])
+}
+

@@ -1,5 +1,6 @@
 import { evaluateAndAwardAchievements } from '@/server/services/achievement.service';
 import { recalculateAllCollegeRanks } from '@/server/services/ranking.service';
+import { recomputeAllGenderWarAggregates } from '@/server/services/gender-war.service';
 import { db } from "@/lib/db";
 import { leetcodeProvider } from "@/server/providers/leetcode.provider";
 
@@ -117,6 +118,14 @@ export async function syncUserLeetCodeData(accountId: string): Promise<{
       await recalculateAllCollegeRanks();
     } catch (rankingErr) {
       console.error('Failed to recalculate college ranks post-sync:', rankingErr);
+    }
+
+    // R5 — Recompute Gender War aggregates after every individual sync (FR-416).
+    // Failure is non-fatal; previous cached values remain valid.
+    try {
+      await recomputeAllGenderWarAggregates();
+    } catch (genderWarErr) {
+      console.error('Failed to recompute Gender War aggregates post-sync:', genderWarErr);
     }
 
     return { success: true };

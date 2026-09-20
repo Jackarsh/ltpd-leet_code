@@ -207,6 +207,7 @@ Every task MUST strictly follow this format:
   - Within each story: Tests (if requested) → Models → Services → Endpoints → Integration
   - Each phase should be a complete, independently testable increment
 - **Final Phase**: Polish & Cross-Cutting Concerns
+  - **MANDATORY PER-FEATURE TASK**: Always add a task at the end of every feature for interactive UI/UX frontend review with the user to collect and apply design recommendations (visual craftsmanship, layout, micro-interactions, states). This ensures the frontend feels bespoke and human-crafted rather than generic or AI-generated. (Triggered once per feature at the end, NOT after each individual phase).
 
 ## Done When
 
