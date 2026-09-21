@@ -4,7 +4,7 @@ import React, { useTransition, useState } from "react";
 import { syncNow } from "@/server/actions/sync-leetcode";
 import { SyncStatusBadge } from "@/components/ui/SyncStatusBadge";
 import { formatRelativeTime } from "@/lib/sync-utils";
-import { RefreshCw, CheckCircle2, AlertCircle } from "lucide-react";
+import { RefreshCw, CheckCircle2, AlertCircle, Code2 } from "lucide-react";
 
 interface Props {
   username: string;
@@ -37,54 +37,59 @@ export function SyncControlBar({
   };
 
   return (
-    <div className="rounded-2xl border border-zinc-800 bg-zinc-900/50 p-4 sm:p-5 backdrop-blur-md shadow-sm space-y-3">
+    <div className="rounded-xl border border-[#30363d] bg-[#161b22] p-4 space-y-3">
       <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-4">
         <div className="flex items-center gap-3">
-          <div className="flex h-10 w-10 items-center justify-center rounded-xl bg-indigo-500/10 border border-indigo-500/20 text-indigo-400 font-mono font-bold text-sm">
+          <div className="flex h-9 w-9 items-center justify-center rounded-lg bg-[#21262d] border border-[#30363d] text-[#f0883e] font-mono font-bold text-sm">
             LC
           </div>
           <div>
             <div className="flex items-center gap-2">
-              <span className="font-semibold text-zinc-100">@{username}</span>
-              <SyncStatusBadge status={status} isStale={isStale} lastSyncAt={lastSyncAt} />
+              <span className="font-display font-semibold text-sm text-[#f0f6fc]">
+                LeetCode Sync Engine
+              </span>
+              <SyncStatusBadge status={status} isStale={isStale} />
             </div>
-            <p className="text-xs text-zinc-500 mt-0.5">
-              Last synced: {formatRelativeTime(lastSyncAt)}
+            <p className="text-xs text-[#848d97] mt-0.5">
+              Target: <span className="text-[#f0f6fc] font-medium">@{username}</span>
+              {lastSyncAt && (
+                <> &bull; Last synchronized {formatRelativeTime(lastSyncAt)}</>
+              )}
             </p>
           </div>
         </div>
 
         <button
           onClick={handleSync}
-          disabled={isPending}
-          className="inline-flex items-center justify-center gap-2 rounded-xl bg-zinc-800 hover:bg-zinc-700 px-4 py-2 text-xs font-semibold text-zinc-200 hover:text-white border border-zinc-700 transition-all disabled:opacity-50 shadow-sm"
+          disabled={isPending || status === "IN_PROGRESS"}
+          className="btn-press flex items-center justify-center gap-2 rounded-md bg-[#238636] px-3.5 py-1.5 text-xs font-semibold text-white hover:bg-[#2ea043] disabled:opacity-50 disabled:cursor-not-allowed transition-all shadow-sm self-start sm:self-auto"
         >
-          <RefreshCw className={`h-3.5 w-3.5 ${isPending ? "animate-spin text-indigo-400" : ""}`} />
-          {isPending ? "Refreshing..." : "Sync Now"}
+          <RefreshCw className={`h-3.5 w-3.5 ${isPending ? "animate-spin" : ""}`} />
+          <span>{isPending ? "Synchronizing..." : "Sync Now"}</span>
         </button>
       </div>
 
-      {message && (
-        <div
-          className={`text-xs p-3 rounded-lg flex items-center gap-2 ${
-            message.type === "success"
-              ? "bg-emerald-500/10 border border-emerald-500/20 text-emerald-300"
-              : "bg-rose-500/10 border border-rose-500/20 text-rose-300"
-          }`}
-        >
-          {message.type === "success" ? (
-            <CheckCircle2 className="h-4 w-4 shrink-0 text-emerald-400" />
-          ) : (
-            <AlertCircle className="h-4 w-4 shrink-0 text-rose-400" />
-          )}
-          <span>{message.text}</span>
+      {lastSyncError && status === "FAILED" && (
+        <div className="flex items-center gap-2 rounded-md bg-[#f85149]/10 border border-[#f85149]/30 p-2.5 text-xs text-[#f85149]">
+          <AlertCircle className="h-4 w-4 shrink-0" />
+          <span>Sync error: {lastSyncError}</span>
         </div>
       )}
 
-      {lastSyncError && status === "FAILED" && !message && (
-        <div className="text-xs p-3 rounded-lg bg-rose-500/10 border border-rose-500/20 text-rose-300 flex items-center gap-2">
-          <AlertCircle className="h-4 w-4 shrink-0 text-rose-400" />
-          <span>Sync issue: {lastSyncError}. Your previous stats are preserved.</span>
+      {message && (
+        <div
+          className={`flex items-center gap-2 rounded-md p-2.5 text-xs border ${
+            message.type === "success"
+              ? "bg-[#238636]/10 border-[#238636]/30 text-[#3fb950]"
+              : "bg-[#f85149]/10 border-[#f85149]/30 text-[#f85149]"
+          }`}
+        >
+          {message.type === "success" ? (
+            <CheckCircle2 className="h-4 w-4 shrink-0" />
+          ) : (
+            <AlertCircle className="h-4 w-4 shrink-0" />
+          )}
+          <span>{message.text}</span>
         </div>
       )}
     </div>

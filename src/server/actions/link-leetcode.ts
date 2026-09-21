@@ -68,13 +68,16 @@ export async function linkLeetCodeAccount(values: { username: string }) {
     data: { leetcodeUsername: username },
   });
 
-  // Asynchronously trigger initial sync in background
-  syncUserLeetCodeData(linked.id).catch((err) => {
+  // Await initial sync so stats are populated immediately
+  try {
+    await syncUserLeetCodeData(linked.id);
+  } catch (err) {
     console.error("Initial sync error:", err);
-  });
+  }
 
   revalidatePath("/dashboard");
   revalidatePath("/settings/profile");
+  revalidatePath("/");
 
   return { success: `Successfully linked LeetCode account @${username}!` };
 }

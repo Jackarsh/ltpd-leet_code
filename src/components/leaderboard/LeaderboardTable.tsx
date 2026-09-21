@@ -2,16 +2,7 @@
 
 import { useState } from "react";
 import { useRouter, usePathname, useSearchParams } from "next/navigation";
-import {
-  ArrowUpDown,
-  ArrowUp,
-  ArrowDown,
-  ChevronLeft,
-  ChevronRight,
-  Calculator,
-  Users,
-  SearchX,
-} from "lucide-react";
+import { ArrowUp, ArrowDown, ChevronLeft, ChevronRight } from "lucide-react";
 import {
   LeaderboardResponseDTO,
   LeaderboardSortDimension,
@@ -38,16 +29,16 @@ export function LeaderboardTable({
   const searchParams = useSearchParams();
   const [showFormulaModal, setShowFormulaModal] = useState(false);
 
-  const handleSort = (dimension: LeaderboardSortDimension) => {
+  const handleSortChange = (newDimension: LeaderboardSortDimension) => {
     const params = new URLSearchParams(searchParams.toString());
-    params.set("sortBy", dimension);
+    params.set("sortBy", newDimension);
+    params.set("sortDir", newDimension === "RANK" ? "asc" : "desc");
+    router.push(`${pathname}?${params.toString()}`);
+  };
 
-    if (sortBy === dimension) {
-      params.set("sortDir", sortDir === "asc" ? "desc" : "asc");
-    } else {
-      params.set("sortDir", dimension === "RANK" ? "asc" : "desc");
-    }
-
+  const toggleSortDir = () => {
+    const params = new URLSearchParams(searchParams.toString());
+    params.set("sortDir", sortDir === "asc" ? "desc" : "asc");
     router.push(`${pathname}?${params.toString()}`);
   };
 
@@ -57,173 +48,84 @@ export function LeaderboardTable({
     router.push(`${pathname}?${params.toString()}`);
   };
 
-  const renderSortIcon = (dimension: LeaderboardSortDimension) => {
-    if (sortBy !== dimension) {
-      return <ArrowUpDown className="h-3.5 w-3.5 text-zinc-400 group-hover:text-zinc-300 transition-colors" />;
-    }
-    return sortDir === "asc" ? (
-      <ArrowUp className="h-3.5 w-3.5 text-indigo-400" />
-    ) : (
-      <ArrowDown className="h-3.5 w-3.5 text-indigo-400" />
-    );
-  };
-
-  const students = data.students;
+  const sortOptions = [
+    { value: "RANK", label: "Ranking" },
+    { value: "TOTAL_SOLVED", label: "Total Solved" },
+    { value: "HARD_SOLVED", label: "Hard Solved" },
+    { value: "CONTEST_RATING", label: "Contest Rating" },
+    { value: "STREAK", label: "Streak Days" },
+  ];
 
   return (
-    <>
-      <div className="rounded-xl border border-zinc-800 bg-zinc-900/60 overflow-hidden backdrop-blur-sm shadow-xl">
-        {/* Table Header Bar */}
-        <div className="flex items-center justify-between px-4 py-3 border-b border-zinc-800/80 bg-zinc-950/40">
-          <div className="flex items-center gap-2 text-xs text-zinc-400">
-            <Users className="h-4 w-4 text-indigo-400" />
-            <span>
-              Showing <strong className="text-zinc-200">{students.length}</strong> of{" "}
-              <strong className="text-zinc-200">{data.total}</strong> eligible students
-            </span>
-          </div>
-
+    <div className="w-full">
+      <div className="flex flex-wrap items-center justify-between gap-3 mb-4 pb-3 border-b border-[#21262d]">
+        <div className="flex items-center gap-3">
+          <span className="text-xs text-[#848d97]">
+            Showing <strong className="text-[#e6edf3]">{data.students.length}</strong> of{" "}
+            <strong className="text-[#e6edf3]">{data.total}</strong> ranked coders
+          </span>
           <button
             onClick={() => setShowFormulaModal(true)}
-            className="flex items-center gap-1.5 text-xs text-indigo-400 hover:text-indigo-300 font-medium transition-colors"
+            className="text-xs text-[#848d97] hover:text-[#e6edf3] hover:underline"
           >
-            <Calculator className="h-3.5 w-3.5" />
-            <span>Formula & Weights</span>
+            Ranking Formula
           </button>
         </div>
 
-        {/* Responsive Table */}
-        <div className="overflow-x-auto">
-          <table className="w-full text-left border-collapse">
-            <thead>
-              <tr className="border-b border-zinc-800 bg-zinc-950/60 text-[11px] font-bold text-zinc-400 uppercase tracking-wider">
-                <th
-                  onClick={() => handleSort("RANK")}
-                  className="py-3 pl-4 pr-3 cursor-pointer group hover:text-zinc-200 transition-colors"
-                >
-                  <div className="flex items-center gap-1">
-                    <span>Rank</span>
-                    {renderSortIcon("RANK")}
-                  </div>
-                </th>
-
-                <th className="py-3 px-3">Student</th>
-
-                <th
-                  onClick={() => handleSort("TOTAL_SOLVED")}
-                  className="py-3 px-3 cursor-pointer group hover:text-zinc-200 transition-colors"
-                >
-                  <div className="flex items-center gap-1">
-                    <span>Solved</span>
-                    {renderSortIcon("TOTAL_SOLVED")}
-                  </div>
-                </th>
-
-                <th
-                  onClick={() => handleSort("HARD_SOLVED")}
-                  className="py-3 px-3 cursor-pointer group hover:text-zinc-200 transition-colors hidden sm:table-cell"
-                >
-                  <div className="flex items-center gap-1">
-                    <span>Breakdown (E/M/H)</span>
-                    {renderSortIcon("HARD_SOLVED")}
-                  </div>
-                </th>
-
-                <th
-                  onClick={() => handleSort("CONTEST_RATING")}
-                  className="py-3 px-3 cursor-pointer group hover:text-zinc-200 transition-colors hidden md:table-cell"
-                >
-                  <div className="flex items-center gap-1">
-                    <span>Rating</span>
-                    {renderSortIcon("CONTEST_RATING")}
-                  </div>
-                </th>
-
-                <th
-                  onClick={() => handleSort("STREAK")}
-                  className="py-3 px-3 cursor-pointer group hover:text-zinc-200 transition-colors hidden lg:table-cell"
-                >
-                  <div className="flex items-center gap-1">
-                    <span>Streak</span>
-                    {renderSortIcon("STREAK")}
-                  </div>
-                </th>
-
-                <th
-                  onClick={() => handleSort("RANK")}
-                  className="py-3 pl-3 pr-4 text-right cursor-pointer group hover:text-zinc-200 transition-colors"
-                >
-                  <div className="flex items-center justify-end gap-1">
-                    <span>Weighted Score</span>
-                    {renderSortIcon("RANK")}
-                  </div>
-                </th>
-              </tr>
-            </thead>
-            <tbody className="divide-y divide-zinc-800/60">
-              {students.length > 0 ? (
-                students.map((student) => (
-                  <LeaderboardRow
-                    key={student.id}
-                    row={student}
-                    isCurrentUser={currentUserId ? student.id === currentUserId : false}
-                  />
-                ))
-              ) : (
-                <tr>
-                  <td colSpan={7} className="py-12 text-center">
-                    <div className="flex flex-col items-center justify-center gap-2">
-                      <SearchX className="h-8 w-8 text-zinc-400" />
-                      <p className="text-sm font-semibold text-zinc-300">
-                        No students match the selected filters
-                      </p>
-                      <p className="text-xs text-zinc-400 max-w-sm">
-                        Try clearing your search query or adjusting your branch and batch filters to see more results.
-                      </p>
-                    </div>
-                  </td>
-                </tr>
-              )}
-            </tbody>
-          </table>
+        <div className="flex items-center gap-1.5">
+          <span className="text-xs text-[#6e7681] mr-1 hidden sm:inline">Sort by:</span>
+          <select
+            value={sortBy}
+            onChange={(e) => handleSortChange(e.target.value as LeaderboardSortDimension)}
+            className="rounded-md border border-[#30363d] bg-[#161b22] px-2.5 py-1.5 text-xs font-semibold text-[#e6edf3] focus:border-[#484f58] focus:outline-none cursor-pointer"
+          >
+            {sortOptions.map((opt) => (
+              <option key={opt.value} value={opt.value}>{opt.label}</option>
+            ))}
+          </select>
+          <button
+            onClick={toggleSortDir}
+            title={sortDir === "asc" ? "Ascending" : "Descending"}
+            className="flex h-8 w-8 items-center justify-center rounded-md border border-[#30363d] bg-[#161b22] text-[#848d97] hover:text-[#e6edf3] hover:border-[#484f58] transition-colors"
+          >
+            {sortDir === "asc" ? <ArrowUp className="h-3.5 w-3.5" /> : <ArrowDown className="h-3.5 w-3.5" />}
+          </button>
         </div>
-
-        {/* Pagination Footer (FR-208) */}
-        {data.totalPages > 1 && (
-          <div className="flex items-center justify-between px-4 py-3 border-t border-zinc-800 bg-zinc-950/40">
-            <div className="text-xs text-zinc-400">
-              Page <strong className="text-zinc-200">{data.page}</strong> of{" "}
-              <strong className="text-zinc-200">{data.totalPages}</strong>
-            </div>
-
-            <div className="flex items-center gap-2">
-              <button
-                onClick={() => handlePageChange(data.page - 1)}
-                disabled={data.page <= 1}
-                className="flex items-center gap-1 rounded-lg border border-zinc-800 bg-zinc-900 px-3 py-1.5 text-xs font-medium text-zinc-300 hover:bg-zinc-800 disabled:opacity-40 disabled:pointer-events-none transition-colors"
-              >
-                <ChevronLeft className="h-3.5 w-3.5" />
-                Previous
-              </button>
-
-              <button
-                onClick={() => handlePageChange(data.page + 1)}
-                disabled={data.page >= data.totalPages}
-                className="flex items-center gap-1 rounded-lg border border-zinc-800 bg-zinc-900 px-3 py-1.5 text-xs font-medium text-zinc-300 hover:bg-zinc-800 disabled:opacity-40 disabled:pointer-events-none transition-colors"
-              >
-                Next
-                <ChevronRight className="h-3.5 w-3.5" />
-              </button>
-            </div>
-          </div>
-        )}
       </div>
 
-      {/* Global Ranking Formula Explanation Modal */}
-      <RankingFormulaModal
-        isOpen={showFormulaModal}
-        onClose={() => setShowFormulaModal(false)}
-      />
-    </>
+      {data.students.length > 0 ? (
+        <div className="space-y-3">
+          {data.students.map((row) => (
+            <LeaderboardRow key={row.id} row={row} isCurrentUser={currentUserId === row.id} />
+          ))}
+        </div>
+      ) : (
+        <div className="py-16 text-center rounded-xl border border-[#21262d] bg-[#161b22]/50">
+          <p className="text-sm font-medium text-[#848d97]">No coders match the selected filters</p>
+          <p className="text-xs text-[#6e7681] mt-1">Try broadening your search or resetting filters</p>
+        </div>
+      )}
+
+      {data.totalPages > 1 && (
+        <div className="flex flex-wrap items-center justify-between gap-3 mt-6 pt-4 border-t border-[#21262d]">
+          <span className="text-xs text-[#848d97]">
+            Page <strong className="text-[#e6edf3]">{data.page}</strong> of{" "}
+            <strong className="text-[#e6edf3]">{data.totalPages}</strong>
+          </span>
+          <div className="flex items-center gap-1.5">
+            <button onClick={() => handlePageChange(data.page - 1)} disabled={data.page <= 1}
+              className="flex items-center gap-1 rounded-md border border-[#30363d] bg-[#161b22] px-3 py-1.5 text-xs font-medium text-[#c9d1d9] hover:bg-[#21262d] disabled:opacity-40 disabled:cursor-not-allowed transition-colors">
+              <ChevronLeft className="h-3.5 w-3.5" /><span>Previous</span>
+            </button>
+            <button onClick={() => handlePageChange(data.page + 1)} disabled={data.page >= data.totalPages}
+              className="flex items-center gap-1 rounded-md border border-[#30363d] bg-[#161b22] px-3 py-1.5 text-xs font-medium text-[#c9d1d9] hover:bg-[#21262d] disabled:opacity-40 disabled:cursor-not-allowed transition-colors">
+              <span>Next</span><ChevronRight className="h-3.5 w-3.5" />
+            </button>
+          </div>
+        </div>
+      )}
+
+      {showFormulaModal && <RankingFormulaModal isOpen={showFormulaModal} onClose={() => setShowFormulaModal(false)} />}
+    </div>
   );
 }

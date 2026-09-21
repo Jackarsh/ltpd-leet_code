@@ -1,5 +1,6 @@
+"use client";
+
 import React from "react";
-import { Trophy, Globe, Flame } from "lucide-react";
 
 interface Props {
   contestRating: number | null;
@@ -13,36 +14,37 @@ export function ContestRatingCard({
   contestsAttended,
 }: Props) {
   return (
-    <div className="rounded-2xl border border-zinc-800 bg-zinc-900/40 p-5 space-y-4 backdrop-blur-md">
-      <div className="flex items-center justify-between">
-        <h3 className="text-base font-semibold text-zinc-100 flex items-center gap-2">
-          <Trophy className="h-4 w-4 text-amber-400" />
-          Contest Standing
-        </h3>
+    <div className="card-hover rounded-xl border border-[#30363d] bg-[#161b22] p-4 space-y-3">
+      <div className="flex items-center justify-between border-b border-[#21262d] pb-2.5">
+        <div>
+          <h3 className="font-display text-sm font-bold text-[#e6edf3]">Contest Performance</h3>
+          <p className="text-[11px] text-[#848d97]">Verified LeetCode rating</p>
+        </div>
+
         {contestRating ? (
-          <span className="rounded-full bg-amber-500/10 px-2.5 py-0.5 text-xs font-bold text-amber-400 border border-amber-500/20">
-            Rating {contestRating}
+          <span className="font-mono text-lg font-bold text-[#e6edf3]">
+            {Math.round(contestRating)}
           </span>
         ) : (
-          <span className="text-xs text-zinc-500">Unrated</span>
+          <span className="text-xs text-[#848d97] font-medium">Unrated</span>
         )}
       </div>
 
-      <div className="grid grid-cols-2 gap-3">
-        <div className="rounded-xl border border-zinc-800 bg-zinc-800/30 p-3">
-          <div className="text-xs text-zinc-400 flex items-center gap-1">
-            <Globe className="h-3 w-3 text-indigo-400" /> Global Rank
-          </div>
-          <div className="text-xl font-bold text-zinc-100 mt-1">
+      <div className="grid grid-cols-2 gap-3 pt-1">
+        <div>
+          <span className="text-[10px] uppercase tracking-wider text-[#848d97] font-semibold">
+            Global Rank
+          </span>
+          <div className="font-mono text-sm font-bold text-[#e6edf3] mt-0.5">
             {globalContestRank ? `#${globalContestRank.toLocaleString()}` : "—"}
           </div>
         </div>
 
-        <div className="rounded-xl border border-zinc-800 bg-zinc-800/30 p-3">
-          <div className="text-xs text-zinc-400 flex items-center gap-1">
-            <Flame className="h-3 w-3 text-amber-400" /> Contests
-          </div>
-          <div className="text-xl font-bold text-zinc-100 mt-1">
+        <div>
+          <span className="text-[10px] uppercase tracking-wider text-[#848d97] font-semibold">
+            Contests Attended
+          </span>
+          <div className="font-mono text-sm font-bold text-[#e6edf3] mt-0.5">
             {contestsAttended}
           </div>
         </div>

@@ -1,6 +1,5 @@
 "use client";
 
-import { CheckCircle2, Award, Sparkles, Clock, History } from "lucide-react";
 import { ActivityFeedItemDTO } from "@/types/profile";
 
 interface RecentActivityFeedProps {
@@ -19,27 +18,13 @@ export function RecentActivityFeed({ feed }: RecentActivityFeedProps) {
     return d.toLocaleDateString([], { month: "short", day: "numeric" });
   };
 
-  const getItemIcon = (type: ActivityFeedItemDTO["type"]) => {
-    switch (type) {
-      case "ACHIEVEMENT_EARNED":
-        return <Award className="h-4 w-4 text-amber-400" />;
-      case "HARD_SOLVED":
-        return <Sparkles className="h-4 w-4 text-rose-400" />;
-      case "MILESTONE_REACHED":
-        return <Sparkles className="h-4 w-4 text-indigo-400" />;
-      default:
-        return <CheckCircle2 className="h-4 w-4 text-emerald-400" />;
-    }
-  };
-
   if (!feed || feed.length === 0) {
     return (
-      <div className="rounded-2xl border border-zinc-800 bg-zinc-900/60 p-6 backdrop-blur-md shadow-lg">
-        <div className="flex items-center gap-2 text-sm font-bold text-zinc-200 uppercase tracking-wider mb-4">
-          <History className="h-4 w-4 text-indigo-400" />
-          <span>Recent Activity</span>
+      <div className="rounded-xl border border-[#30363d] bg-[#161b22] p-6 shadow-sm">
+        <div className="text-sm font-bold text-[#e6edf3] uppercase tracking-wider mb-4">
+          Recent Activity
         </div>
-        <div className="rounded-xl bg-zinc-950/60 border border-zinc-800/80 p-6 text-center text-xs text-zinc-400">
+        <div className="rounded-xl bg-[#0d1117] border border-[#21262d] p-6 text-center text-xs text-[#848d97]">
           No recent activity recorded yet.
         </div>
       </div>
@@ -47,39 +32,30 @@ export function RecentActivityFeed({ feed }: RecentActivityFeedProps) {
   }
 
   return (
-    <div className="rounded-2xl border border-zinc-800 bg-zinc-900/60 p-6 backdrop-blur-md shadow-lg">
-      <div className="flex items-center justify-between mb-4">
-        <div className="flex items-center gap-2 text-sm font-bold text-zinc-200 uppercase tracking-wider">
-          <History className="h-4 w-4 text-indigo-400" />
-          <span>Recent Activity</span>
+    <div className="rounded-xl border border-[#30363d] bg-[#161b22] p-6 shadow-sm">
+      <div className="flex items-center justify-between mb-4 border-b border-[#21262d] pb-3">
+        <div className="text-sm font-bold text-[#e6edf3] uppercase tracking-wider">
+          Recent Activity
         </div>
-        <span className="text-xs text-zinc-400 font-mono">
-          {feed.length} {feed.length === 1 ? "event" : "events"}
-        </span>
+        <span className="text-xs text-[#848d97]">{feed.length} events</span>
       </div>
 
-      <div className="space-y-3">
+      <div className="divide-y divide-[#21262d]">
         {feed.map((item) => (
-          <div
-            key={item.id}
-            className="flex items-center justify-between rounded-xl bg-zinc-950/70 border border-zinc-850 p-3 hover:border-zinc-750 transition-colors"
-          >
-            <div className="flex items-center gap-3">
-              <div className="rounded-lg bg-zinc-900 p-2 border border-zinc-800 shrink-0">
-                {getItemIcon(item.type)}
-              </div>
-              <div className="min-w-0">
-                <div className="font-semibold text-sm text-zinc-200 truncate">
-                  {item.title}
-                </div>
-                <div className="text-xs text-zinc-400">{item.subtitle}</div>
-              </div>
+          <div key={item.id} className="py-3 flex items-start justify-between gap-3">
+            <div className="flex flex-col min-w-0">
+              <span className="text-xs font-semibold text-[#e6edf3] truncate">
+                {item.title}
+              </span>
+              {item.subtitle && (
+                <span className="text-[11px] text-[#848d97] mt-0.5">
+                  {item.subtitle}
+                </span>
+              )}
             </div>
-
-            <div className="flex items-center gap-1 text-[11px] text-zinc-400 shrink-0 ml-3">
-              <Clock className="h-3 w-3" />
-              <span>{formatTime(item.timestamp)}</span>
-            </div>
+            <span className="text-[11px] text-[#6e7681] shrink-0 font-mono">
+              {formatTime(item.timestamp)}
+            </span>
           </div>
         ))}
       </div>

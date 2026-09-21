@@ -1,6 +1,7 @@
 "use client";
 
 import React, { useState, useTransition } from "react";
+import { useRouter } from "next/navigation";
 import { linkLeetCodeAccount } from "@/server/actions/link-leetcode";
 import { Loader2, Link2, CheckCircle2, AlertCircle, ExternalLink } from "lucide-react";
 
@@ -10,6 +11,7 @@ interface Props {
 }
 
 export function LeetCodeConnectCard({ currentUsername, isVerified }: Props) {
+  const router = useRouter();
   const [isPending, startTransition] = useTransition();
   const [username, setUsername] = useState(currentUsername || "");
   const [error, setError] = useState<string | null>(null);
@@ -26,83 +28,95 @@ export function LeetCodeConnectCard({ currentUsername, isVerified }: Props) {
         setError(res.error);
       } else if (res.success) {
         setSuccess(res.success);
+        router.refresh();
       }
     });
   };
 
   return (
-    <div className="rounded-2xl border border-zinc-800 bg-zinc-900/40 p-6 sm:p-8 backdrop-blur-sm space-y-5">
-      <div className="flex items-center justify-between">
+    <div className="rounded-xl border border-[#30363d] bg-[#161b22] p-5 space-y-4">
+      <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-3 border-b border-[#21262d] pb-3.5">
         <div className="flex items-center gap-3">
-          <div className="flex h-10 w-10 items-center justify-center rounded-xl bg-amber-500/10 border border-amber-500/20 text-amber-400 font-mono font-bold text-sm">
+          <div className="flex h-9 w-9 items-center justify-center rounded-lg bg-[#21262d] border border-[#30363d] text-[#e6edf3] font-mono font-bold text-xs">
             LC
           </div>
           <div>
-            <h2 className="text-lg font-semibold text-zinc-100 flex items-center gap-2">
-              LeetCode Integration
+            <h2 className="text-sm font-semibold text-[#e6edf3] flex items-center gap-2">
+              LeetCode Account Integration
               {isVerified && (
-                <span className="inline-flex items-center gap-1 text-xs text-emerald-400 font-normal">
-                  <CheckCircle2 className="h-3.5 w-3.5" /> Verified
+                <span className="inline-flex items-center gap-1 text-[11px] text-[#e6edf3] bg-[#21262d] border border-[#30363d] px-2 py-0.5 rounded font-normal">
+                  <CheckCircle2 className="h-3 w-3 text-[#3fb950]" /> Verified
                 </span>
               )}
             </h2>
-            <p className="text-xs text-zinc-400">
-              Connect your public profile to sync solved problems and ratings
+            <p className="text-xs text-[#848d97]">
+              Connect your public profile to sync solved problems, contest ratings, and leaderboard rankings
             </p>
           </div>
         </div>
 
         {currentUsername && (
           <a
-            href={`https://leetcode.com/${currentUsername}/`}
+            href={`https://leetcode.com/u/${currentUsername}/`}
             target="_blank"
             rel="noopener noreferrer"
-            className="text-xs text-indigo-400 hover:text-indigo-300 flex items-center gap-1"
+            className="text-xs text-[#848d97] hover:text-[#e6edf3] flex items-center gap-1 self-start sm:self-auto transition-colors"
           >
-            LeetCode Profile <ExternalLink className="h-3 w-3" />
+            <span>@{currentUsername}</span>
+            <ExternalLink className="h-3 w-3" />
           </a>
         )}
       </div>
 
       {success && (
-        <div className="rounded-lg bg-emerald-500/10 border border-emerald-500/30 p-4 text-emerald-300 text-sm flex items-center gap-2">
-          <CheckCircle2 className="h-4 w-4 shrink-0 text-emerald-400" />
+        <div className="rounded-lg bg-[#21262d] border border-[#238636]/40 p-3 text-xs text-[#3fb950] flex items-center gap-2">
+          <CheckCircle2 className="h-4 w-4 shrink-0" />
           <span>{success}</span>
         </div>
       )}
 
       {error && (
-        <div className="rounded-lg bg-rose-500/10 border border-rose-500/30 p-4 text-rose-300 text-sm flex items-center gap-2">
-          <AlertCircle className="h-4 w-4 shrink-0 text-rose-400" />
+        <div className="rounded-lg bg-[#21262d] border border-[#f85149]/40 p-3 text-xs text-[#f85149] flex items-center gap-2">
+          <AlertCircle className="h-4 w-4 shrink-0" />
           <span>{error}</span>
         </div>
       )}
 
-      <form onSubmit={handleSubmit} className="space-y-4 max-w-md">
+      <form onSubmit={handleSubmit} className="space-y-3">
         <div className="space-y-1.5">
-          <label htmlFor="lcUsername" className="text-sm font-medium text-zinc-300">
+          <label htmlFor="lcUsername" className="text-xs font-medium text-[#848d97]">
             LeetCode Username
           </label>
-          <input
-            id="lcUsername"
-            type="text"
-            required
-            value={username}
-            onChange={(e) => setUsername(e.target.value)}
-            disabled={isPending}
-            placeholder="e.g. tour_de_force"
-            className="w-full rounded-lg border border-zinc-700 bg-zinc-800/50 px-4 py-2.5 text-zinc-100 placeholder:text-zinc-500 focus:border-indigo-500 focus:outline-none focus:ring-1 focus:ring-indigo-500 transition-all disabled:opacity-50"
-          />
+          <div className="flex flex-col sm:flex-row gap-2 max-w-lg">
+            <input
+              id="lcUsername"
+              type="text"
+              required
+              value={username}
+              onChange={(e) => setUsername(e.target.value)}
+              disabled={isPending}
+              placeholder="e.g. neal_wu, tourist"
+              className="flex-1 rounded-md border border-[#30363d] bg-[#0d1117] px-3.5 py-2 text-xs text-[#e6edf3] placeholder-[#6e7681] focus:border-[#484f58] focus:outline-none transition-colors disabled:opacity-50"
+            />
+            <button
+              type="submit"
+              disabled={isPending || !username.trim()}
+              className="btn-press rounded-md bg-[#21262d] border border-[#30363d] px-4 py-2 text-xs font-semibold text-[#e6edf3] hover:bg-[#30363d] transition-all disabled:opacity-50 flex items-center justify-center gap-2 shrink-0"
+            >
+              {isPending ? (
+                <>
+                  <Loader2 className="h-3.5 w-3.5 animate-spin" />
+                  <span>Validating with LeetCode...</span>
+                </>
+              ) : (
+                <>
+                  <Link2 className="h-3.5 w-3.5 text-[#848d97]" />
+                  <span>{currentUsername ? "Update & Sync" : "Connect Account"}</span>
+                </>
+              )}
+            </button>
+          </div>
         </div>
-
-        <button
-          type="submit"
-          disabled={isPending}
-          className="rounded-lg bg-indigo-600 px-5 py-2.5 text-sm font-semibold text-white hover:bg-indigo-500 transition-all disabled:opacity-50 flex items-center gap-2 shadow-md shadow-indigo-600/30"
-        >
-          {isPending ? <Loader2 className="h-4 w-4 animate-spin" /> : <Link2 className="h-4 w-4" />}
-          {isPending ? "Validating with LeetCode..." : currentUsername ? "Update Username" : "Connect Account"}
-        </button>
       </form>
     </div>
   );

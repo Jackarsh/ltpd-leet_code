@@ -1,237 +1,143 @@
 "use client";
 
+import { useState } from "react";
 import type { GroupMetricsDTO } from "@/types/gender-war";
-import { AlertTriangle, Info } from "lucide-react";
-
-// ---------------------------------------------------------------------------
-// Types
-// ---------------------------------------------------------------------------
+import { StickmanAvatar, GenderEmotion } from "@/components/gender-war/StickmanAvatar";
 
 interface SymmetricalPanelsProps {
   male: GroupMetricsDTO;
   female: GroupMetricsDTO;
 }
 
-// ---------------------------------------------------------------------------
-// Helpers
-// ---------------------------------------------------------------------------
-
-/** Formats a float to 1 decimal place or returns "—" when null. */
 function fmt(value: number | null, decimals = 1): string {
-  if (value === null || value === undefined) return "—";
+  if (value === null || value === undefined) return "\u2014";
   return value.toFixed(decimals);
 }
 
-/** Formats an integer or returns "—" when null. */
 function fmtInt(value: number | null): string {
-  if (value === null || value === undefined) return "—";
+  if (value === null || value === undefined) return "\u2014";
   return Math.round(value).toLocaleString();
 }
 
-// ---------------------------------------------------------------------------
-// MetricRow — one labelled metric displayed inside a panel
-// ---------------------------------------------------------------------------
-
-interface MetricRowProps {
-  label: string;
-  total: string;
-  avg: string | null; // null when no avg counterpart
-  isNormalized?: boolean;
-}
-
-function MetricRow({ label, total, avg, isNormalized = false }: MetricRowProps) {
-  return (
-    <div className="flex items-start justify-between gap-3 py-2 border-b border-zinc-800/60 last:border-0">
-      <span className="text-xs text-zinc-400 leading-tight flex-1 min-w-0 break-words">{label}</span>
-      <div className="flex flex-col items-end gap-0.5 shrink-0">
-        <span className="text-sm font-semibold font-mono text-zinc-100">{total}</span>
-        {avg !== null && (
-          <span
-            className={`text-[11px] font-mono ${
-              isNormalized ? "text-indigo-300" : "text-zinc-500"
-            }`}
-            title="Per-participant average (primary comparison basis)"
-          >
-            {avg}/student
-          </span>
-        )}
-      </div>
-    </div>
-  );
-}
-
-// ---------------------------------------------------------------------------
-// GroupPanel — one gender side (FR-406 / FR-407)
-// ---------------------------------------------------------------------------
-
-interface GroupPanelProps {
-  group: GroupMetricsDTO;
-  label: string;
-  /** Neutral colour token applied to the label and participant count badge. */
-  accentClass: string;
-  borderClass: string;
-}
-
-function GroupPanel({ group, label, accentClass, borderClass }: GroupPanelProps) {
-  return (
-    <div
-      className={`flex flex-col rounded-xl border bg-zinc-900/50 overflow-hidden ${borderClass}`}
-    >
-      {/* Header — label + participant count (FR-407) */}
-      <div className="flex items-center justify-between gap-2 px-3.5 sm:px-4 py-3 border-b border-zinc-800">
-        <span className={`text-sm font-bold ${accentClass}`}>{label}</span>
-        <span className="flex items-center gap-1.5 text-[11px] font-medium text-zinc-500">
-          <span className={`h-1.5 w-1.5 rounded-full ${accentClass.replace("text-", "bg-")}`} />
-          {group.participantCount.toLocaleString()} participant
-          {group.participantCount !== 1 ? "s" : ""}
-        </span>
-      </div>
-
-      {/* Status badges */}
-      {(group.isLowSampleSize || group.hasStaleData || group.pendingDataCount > 0) && (
-        <div className="flex flex-col gap-1 px-3.5 sm:px-4 pt-3">
-          {/* FR-415: Low sample size badge */}
-          {group.isLowSampleSize && (
-            <div className="flex items-center gap-1.5 rounded-md border border-amber-800/50 bg-amber-950/30 px-2.5 py-1.5 text-[11px] text-amber-400">
-              <Info className="h-3 w-3 shrink-0" />
-              Low sample size (&lt;5 participants) — per-student averages may be skewed
-            </div>
-          )}
-          {/* FR-434: Stale data indicator */}
-          {group.hasStaleData && (
-            <div className="flex items-center gap-1.5 rounded-md border border-amber-800/50 bg-amber-950/30 px-2.5 py-1.5 text-[11px] text-amber-400">
-              <AlertTriangle className="h-3 w-3 shrink-0" />
-              Contains un-synced data older than 24 hours
-            </div>
-          )}
-          {/* Pending data notice */}
-          {group.pendingDataCount > 0 && (
-            <div className="flex items-center gap-1.5 rounded-md border border-zinc-800 bg-zinc-800/40 px-2.5 py-1.5 text-[11px] text-zinc-400">
-              <Info className="h-3 w-3 shrink-0" />
-              {group.pendingDataCount} participant
-              {group.pendingDataCount !== 1 ? "s have" : " has"} sync pending
-            </div>
-          )}
-        </div>
-      )}
-
-      {/* Metric list — 15 rows (FR-406: both groups show identical metrics) */}
-      <div className="flex flex-col px-3.5 sm:px-4 pb-4 pt-3 gap-0">
-        {/* Problems solved */}
-        <MetricRow
-          label="Problems Solved"
-          total={fmtInt(group.totalSolved)}
-          avg={fmt(group.avgSolvedPerStudent)}
-          isNormalized
-        />
-        <MetricRow
-          label="Hard Problems"
-          total={fmtInt(group.totalHard)}
-          avg={fmt(group.avgHardPerStudent)}
-          isNormalized
-        />
-        <MetricRow
-          label="Medium Problems"
-          total={fmtInt(group.totalMedium)}
-          avg={fmt(group.avgMediumPerStudent)}
-        />
-        <MetricRow
-          label="Easy Problems"
-          total={fmtInt(group.totalEasy)}
-          avg={fmt(group.avgEasyPerStudent)}
-        />
-
-        {/* Contest rating — FR-412: only over rated participants */}
-        <div className="flex items-start justify-between gap-3 py-2 border-b border-zinc-800/60">
-          <div className="flex flex-col flex-1">
-            <span className="text-xs text-zinc-400">Avg Contest Rating</span>
-            <span className="text-[10px] text-zinc-600">
-              over {group.ratedParticipantCount} rated participant
-              {group.ratedParticipantCount !== 1 ? "s" : ""}
-            </span>
-          </div>
-          <span className="text-sm font-semibold font-mono text-zinc-100">
-            {group.avgContestRating !== null
-              ? Math.round(group.avgContestRating)
-              : "—"}
-          </span>
-        </div>
-
-        {/* Contests */}
-        <MetricRow
-          label="Contests Attended"
-          total={fmtInt(group.totalContestsAttended)}
-          avg={fmt(group.avgContestsPerStudent)}
-        />
-
-        {/* Activity metrics */}
-        <MetricRow
-          label="Active Coders (period)"
-          total={fmtInt(group.activeCodersCount)}
-          avg={null}
-        />
-        <MetricRow
-          label="Accepted Submissions (period)"
-          total={fmtInt(group.recentSubmissionsCount)}
-          avg={null}
-        />
-        <MetricRow
-          label="Avg Current Streak"
-          total={`${fmt(group.avgStreakDays)} days`}
-          avg={null}
-        />
-      </div>
-    </div>
-  );
-}
-
-// ---------------------------------------------------------------------------
-// SymmetricalPanels — public component (FR-406 / US1 / US2)
-// ---------------------------------------------------------------------------
-
-/**
- * Side-by-side metric panels for Male and Female groups.
- *
- * Spec compliance:
- * - Both groups display the same metric set (FR-406 / US1 AC2)
- * - No colour or visual weight implies superiority (FR-406 / FR-436)
- * - Participant count is prominent alongside every aggregate (FR-407)
- * - Low sample size badge shown when active count < 5 (FR-415)
- * - Stale data indicator shown when any participant's data is stale (FR-434)
- * - Every raw total has a corresponding per-participant average (FR-410)
- * - Division-by-zero results in "—" from the service layer (FR-413)
- */
 export function SymmetricalPanels({ male, female }: SymmetricalPanelsProps) {
+  const [activeMetric, setActiveMetric] = useState<"SOLVED" | "HARD" | "RATING">("SOLVED");
+
+  let maleVal = 0, femaleVal = 0;
+  if (activeMetric === "SOLVED") { maleVal = male.avgSolvedPerStudent ?? 0; femaleVal = female.avgSolvedPerStudent ?? 0; }
+  else if (activeMetric === "HARD") { maleVal = male.avgHardPerStudent ?? 0; femaleVal = female.avgHardPerStudent ?? 0; }
+  else { maleVal = male.avgContestRating ?? 0; femaleVal = female.avgContestRating ?? 0; }
+
+  const diffPercent = ((femaleVal - maleVal) / (maleVal > 0 ? maleVal : 1)) * 100;
+
+  let femaleEmotion: GenderEmotion = "NEUTRAL_BALANCED";
+  let maleEmotion: GenderEmotion = "NEUTRAL_BALANCED";
+  let commentary = "Neck-and-neck! Both cohorts are evenly matched.";
+  const metricLabel = activeMetric === "SOLVED" ? "problems solved" : activeMetric === "HARD" ? "hard problems" : "contest rating";
+
+  if (diffPercent >= 15) { femaleEmotion = "VICTORIOUS"; maleEmotion = "DEJECTED"; commentary = `Girls have a commanding lead (+${diffPercent.toFixed(0)}%) in ${metricLabel}!`; }
+  else if (diffPercent >= 5) { femaleEmotion = "CONFIDENT"; maleEmotion = "PERPLEXED"; commentary = `Girls are pulling ahead (+${diffPercent.toFixed(0)}%) with strong consistency.`; }
+  else if (diffPercent <= -15) { femaleEmotion = "DEJECTED"; maleEmotion = "VICTORIOUS"; commentary = `Boys have a commanding lead (+${Math.abs(diffPercent).toFixed(0)}%) in ${metricLabel}!`; }
+  else if (diffPercent <= -5) { femaleEmotion = "PERPLEXED"; maleEmotion = "CONFIDENT"; commentary = `Boys are pulling ahead (+${Math.abs(diffPercent).toFixed(0)}%) with strong consistency.`; }
+
   return (
-    <section aria-labelledby="group-metrics-heading">
-      <h2
-        id="group-metrics-heading"
-        className="mb-3 text-base font-semibold text-zinc-100"
-      >
-        Group Metrics
-      </h2>
-
-      {/* Normalized-metric notice */}
-      <p className="mb-4 text-[12px] text-zinc-500">
-        Per-student averages (in{" "}
-        <span className="font-medium text-indigo-400">indigo</span>) are the primary
-        comparison basis — raw totals shown alongside for full context (FR-414).
-      </p>
-
-      <div className="grid grid-cols-1 gap-4 md:grid-cols-2">
-        <GroupPanel
-          group={male}
-          label="Male"
-          accentClass="text-blue-400"
-          borderClass="border-blue-900/40"
-        />
-        <GroupPanel
-          group={female}
-          label="Female"
-          accentClass="text-rose-400"
-          borderClass="border-rose-900/40"
-        />
+    <div className="space-y-6">
+      {/* Commentary + Metric Selector */}
+      <div className="flex flex-col sm:flex-row items-start sm:items-center justify-between gap-3 p-4 rounded-xl border border-[#21262d] bg-[#161b22]">
+        <div className="text-sm">
+          <span className="font-semibold text-[#e6edf3]">{commentary}</span>
+        </div>
+        <div className="flex items-center gap-1.5 self-end sm:self-auto">
+          <span className="text-[11px] text-[#6e7681] mr-1">Emotion Metric:</span>
+          {([
+            { key: "SOLVED", label: "Avg Solved" },
+            { key: "HARD", label: "Hard Solved" },
+            { key: "RATING", label: "Contest Rating" },
+          ] as const).map((m) => (
+            <button key={m.key} onClick={() => setActiveMetric(m.key)}
+              className={`px-2.5 py-1 rounded-md text-xs font-medium transition-all ${
+                activeMetric === m.key ? "bg-[#30363d] text-[#e6edf3]" : "bg-[#21262d] text-[#848d97] hover:text-[#e6edf3]"
+              }`}>
+              {m.label}
+            </button>
+          ))}
+        </div>
       </div>
-    </section>
+
+      <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
+        {/* Female Panel */}
+        <div className="card-hover relative flex flex-col justify-between p-6 rounded-2xl border border-[#21262d] bg-[#161b22]">
+          <div>
+            <div className="flex flex-col items-center justify-center pt-2 pb-4 border-b border-[#21262d]">
+              <StickmanAvatar gender="FEMALE" emotion={femaleEmotion} size={95} />
+              <div className="mt-2 text-center">
+                <span className="inline-flex items-center px-2.5 py-0.5 rounded-full text-xs font-semibold bg-[#21262d] text-[#e6edf3] border border-[#30363d]">
+                  Female Coders ({female.participantCount})
+                </span>
+                <p className="text-[11px] text-[#6e7681] mt-1 capitalize">Status: {femaleEmotion.toLowerCase().replace("_", " ")}</p>
+              </div>
+            </div>
+            <div className="mt-5 space-y-3">
+              {[
+                { label: "Avg Solved / Student", val: fmt(female.avgSolvedPerStudent), bold: true },
+                { label: "Avg Hard Solved", val: fmt(female.avgHardPerStudent), bold: true },
+                { label: "Avg Contest Rating", val: female.avgContestRating ? String(Math.round(female.avgContestRating)) : "Unrated", bold: true },
+                { label: "Active Coders", val: `${female.activeCodersCount} / ${female.participantCount} (${female.participantCount > 0 ? Math.round((female.activeCodersCount / female.participantCount) * 100) : 0}%)`, bold: false },
+              ].map((m) => (
+                <div key={m.label} className="flex items-center justify-between pb-2 border-b border-[#21262d]">
+                  <span className="text-xs text-[#848d97]">{m.label}</span>
+                  <span className={`font-mono text-${m.bold ? "base font-bold" : "sm font-semibold"} text-[#e6edf3]`}>{m.val}</span>
+                </div>
+              ))}
+              <div className="flex items-center justify-between pt-1">
+                <span className="text-xs text-[#848d97]">Total Group Solves</span>
+                <span className="font-mono text-xs font-semibold text-[#6e7681]">{fmtInt(female.totalSolved)} solves</span>
+              </div>
+            </div>
+          </div>
+          {female.isLowSampleSize && (
+            <div className="mt-4 p-2 rounded-lg bg-[#21262d] border border-[#30363d] text-[11px] text-[#848d97]">
+              Small cohort (&lt; 5 coders). Normalized averages may have high variance.
+            </div>
+          )}
+        </div>
+
+        {/* Male Panel */}
+        <div className="card-hover relative flex flex-col justify-between p-6 rounded-2xl border border-[#21262d] bg-[#161b22]">
+          <div>
+            <div className="flex flex-col items-center justify-center pt-2 pb-4 border-b border-[#21262d]">
+              <StickmanAvatar gender="MALE" emotion={maleEmotion} size={95} />
+              <div className="mt-2 text-center">
+                <span className="inline-flex items-center px-2.5 py-0.5 rounded-full text-xs font-semibold bg-[#21262d] text-[#e6edf3] border border-[#30363d]">
+                  Male Coders ({male.participantCount})
+                </span>
+                <p className="text-[11px] text-[#6e7681] mt-1 capitalize">Status: {maleEmotion.toLowerCase().replace("_", " ")}</p>
+              </div>
+            </div>
+            <div className="mt-5 space-y-3">
+              {[
+                { label: "Avg Solved / Student", val: fmt(male.avgSolvedPerStudent), bold: true },
+                { label: "Avg Hard Solved", val: fmt(male.avgHardPerStudent), bold: true },
+                { label: "Avg Contest Rating", val: male.avgContestRating ? String(Math.round(male.avgContestRating)) : "Unrated", bold: true },
+                { label: "Active Coders", val: `${male.activeCodersCount} / ${male.participantCount} (${male.participantCount > 0 ? Math.round((male.activeCodersCount / male.participantCount) * 100) : 0}%)`, bold: false },
+              ].map((m) => (
+                <div key={m.label} className="flex items-center justify-between pb-2 border-b border-[#21262d]">
+                  <span className="text-xs text-[#848d97]">{m.label}</span>
+                  <span className={`font-mono text-${m.bold ? "base font-bold" : "sm font-semibold"} text-[#e6edf3]`}>{m.val}</span>
+                </div>
+              ))}
+              <div className="flex items-center justify-between pt-1">
+                <span className="text-xs text-[#848d97]">Total Group Solves</span>
+                <span className="font-mono text-xs font-semibold text-[#6e7681]">{fmtInt(male.totalSolved)} solves</span>
+              </div>
+            </div>
+          </div>
+          {male.isLowSampleSize && (
+            <div className="mt-4 p-2 rounded-lg bg-[#21262d] border border-[#30363d] text-[11px] text-[#848d97]">
+              Small cohort (&lt; 5 coders). Normalized averages may have high variance.
+            </div>
+          )}
+        </div>
+      </div>
+    </div>
   );
 }

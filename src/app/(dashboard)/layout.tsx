@@ -8,7 +8,7 @@ export default function DashboardLayout({
 }) {
   return (
     <SessionProvider>
-      <div className="min-h-screen flex flex-col bg-zinc-950 text-zinc-100">
+      <div className="min-h-screen flex flex-col bg-[#0d1117] text-zinc-100">
         <Navbar />
         <main className="flex-1">{children}</main>
       </div>

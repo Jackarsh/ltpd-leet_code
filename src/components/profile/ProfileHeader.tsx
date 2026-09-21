@@ -1,6 +1,6 @@
 "use client";
 
-import { ExternalLink, Trophy, AlertTriangle, GraduationCap } from "lucide-react";
+import { ExternalLink, AlertTriangle } from "lucide-react";
 import { PublicStudentProfileDTO } from "@/types/profile";
 
 interface ProfileHeaderProps {
@@ -13,25 +13,21 @@ export function ProfileHeader({ profile }: ProfileHeaderProps) {
     profile.graduationYear ? `Class of ${profile.graduationYear}` : null,
   ]
     .filter(Boolean)
-    .join(" • ");
+    .join(" \u00B7 ");
 
   return (
-    <div className="rounded-2xl border border-zinc-800 bg-zinc-900/60 p-6 sm:p-8 backdrop-blur-md relative overflow-hidden shadow-xl mb-8">
-      {/* Background Accent Gradient */}
-      <div className="absolute top-0 right-0 -mt-8 -mr-8 w-64 h-64 bg-indigo-500/10 rounded-full blur-3xl pointer-events-none" />
-
-      <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-6 relative z-10">
+    <div className="rounded-xl border border-[#30363d] bg-[#161b22] p-6 mb-8">
+      <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-6">
         <div className="flex items-center gap-5">
-          {/* Avatar with fallback */}
           <div className="relative shrink-0">
             {profile.avatarUrl ? (
               <img
                 src={profile.avatarUrl}
                 alt={profile.displayName}
-                className="h-20 w-20 rounded-full object-cover border-2 border-zinc-700 shadow-md"
+                className="h-20 w-20 rounded-xl object-cover border border-[#30363d]"
               />
             ) : (
-              <div className="h-20 w-20 rounded-full bg-gradient-to-br from-indigo-900 to-zinc-900 border-2 border-indigo-500/50 flex items-center justify-center font-bold text-2xl text-indigo-200 shadow-md">
+              <div className="h-20 w-20 rounded-xl bg-[#21262d] border border-[#30363d] flex items-center justify-center font-display font-bold text-2xl text-[#e6edf3]">
                 {profile.displayName
                   .split(" ")
                   .map((n) => n[0])
@@ -41,73 +37,56 @@ export function ProfileHeader({ profile }: ProfileHeaderProps) {
               </div>
             )}
             {profile.collegeRank && (
-              <span className="absolute -bottom-1 -right-1 flex h-6 min-w-6 items-center justify-center rounded-full bg-zinc-900 px-1.5 text-xs font-bold text-amber-400 border border-amber-500/40 shadow">
+              <span className="absolute -bottom-2 -right-2 flex h-6 min-w-6 items-center justify-center rounded-md bg-[#21262d] px-2 text-xs font-mono font-bold text-[#e6edf3] border border-[#30363d] shadow-sm">
                 #{profile.collegeRank}
               </span>
             )}
           </div>
 
           <div>
-            <div className="flex items-center gap-3 flex-wrap">
-              <h1 className="text-2xl font-bold text-zinc-100">{profile.displayName}</h1>
+            <div className="flex flex-wrap items-center gap-2">
+              <h1 className="font-display text-2xl font-bold text-[#e6edf3]">
+                {profile.displayName}
+              </h1>
               {profile.gender && (
-                <span className="rounded-md bg-zinc-800/80 px-2 py-0.5 text-xs font-semibold text-zinc-300 border border-zinc-700">
-                  {profile.gender === "MALE" ? "Male" : "Female"}
-                </span>
-              )}
-              {profile.isStale && (
-                <span
-                  title="Data may not reflect most recent activity"
-                  className="flex items-center gap-1 rounded-md bg-amber-500/10 px-2 py-0.5 text-xs font-semibold text-amber-400 border border-amber-500/20"
-                >
-                  <AlertTriangle className="h-3 w-3" />
-                  Stale Data
+                <span className="inline-flex items-center px-2 py-0.5 rounded text-[10px] font-semibold bg-[#21262d] text-[#848d97] border border-[#30363d]">
+                  {profile.gender}
                 </span>
               )}
             </div>
 
-            <div className="mt-1 flex items-center gap-2 text-sm text-zinc-400 flex-wrap">
+            <div className="flex flex-wrap items-center gap-3 text-xs text-[#848d97] mt-1.5">
               <a
-                href={`https://leetcode.com/u/${profile.leetcodeUsername}`}
+                href={`https://leetcode.com/u/${encodeURIComponent(profile.leetcodeUsername)}`}
                 target="_blank"
                 rel="noopener noreferrer"
-                className="inline-flex items-center gap-1 text-indigo-400 hover:text-indigo-300 hover:underline transition-colors font-medium"
+                className="flex items-center gap-1 text-[#e6edf3] hover:underline font-medium"
               >
                 <span>@{profile.leetcodeUsername}</span>
-                <ExternalLink className="h-3.5 w-3.5" />
+                <ExternalLink className="h-3 w-3" />
               </a>
 
               {academicDetails && (
-                <>
-                  <span>•</span>
-                  <div className="flex items-center gap-1 text-zinc-300">
-                    <GraduationCap className="h-3.5 w-3.5 text-zinc-400" />
-                    <span>{academicDetails}</span>
-                  </div>
-                </>
+                <div className="flex items-center gap-1.5">
+                  <span>&bull;</span>
+                  <span>{academicDetails}</span>
+                </div>
               )}
             </div>
           </div>
         </div>
 
-        {/* College Rank & Weighted Score Badge */}
-        <div className="flex sm:flex-col items-end justify-between border-t sm:border-t-0 border-zinc-800 pt-4 sm:pt-0">
-          <div className="text-left sm:text-right">
-            <span className="text-xs font-semibold uppercase tracking-wider text-zinc-400">
-              College Rank
+        <div className="flex sm:flex-col items-center sm:items-end justify-between border-t sm:border-t-0 border-[#21262d] pt-4 sm:pt-0">
+          <div className="flex items-center gap-2">
+            <span className="font-mono text-sm font-bold text-[#e6edf3]">
+              College Rank: {profile.collegeRank ? `#${profile.collegeRank}` : "Unranked"}
             </span>
-            <div className="flex items-center gap-1.5 text-2xl font-black text-zinc-100 sm:justify-end">
-              <Trophy className="h-5 w-5 text-amber-400" />
-              <span>{profile.collegeRank ? `#${profile.collegeRank}` : "—"}</span>
-            </div>
           </div>
 
-          {profile.weightedScore !== null && (
-            <div className="text-right mt-1">
-              <span className="text-xs text-zinc-400">Overall Score: </span>
-              <span className="text-sm font-mono font-bold text-indigo-400">
-                {profile.weightedScore} pts
-              </span>
+          {profile.isStale && (
+            <div className="flex items-center gap-1 text-xs text-[#848d97] mt-1">
+              <AlertTriangle className="h-3 w-3" />
+              <span>Data may be outdated</span>
             </div>
           )}
         </div>
