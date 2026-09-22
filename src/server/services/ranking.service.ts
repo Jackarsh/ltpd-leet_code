@@ -14,6 +14,8 @@ export interface RankCandidate {
   contestRating: number | null;
   weightedScore: number;
   createdAt: Date;
+  currentCollegeRank: number | null;
+  currentWeightedScore: number | null;
 }
 
 export function computeStudentScoreBreakdown(
@@ -99,6 +101,8 @@ export async function recalculateAllCollegeRanks(): Promise<{ totalRanked: numbe
         contestRating,
         weightedScore,
         createdAt: u.createdAt,
+        currentCollegeRank: profile.collegeRank,
+        currentWeightedScore: profile.weightedScore,
       };
     });
 
@@ -147,16 +151,24 @@ export async function recalculateAllCollegeRanks(): Promise<{ totalRanked: numbe
     return a.createdAt.getTime() - b.createdAt.getTime();
   });
 
-  // 4. Batch update ranks in a transaction
-  const updates = candidates.map((candidate, index) => {
+  // 4. Batch update ranks in a transaction - filter out unchanged profiles to prevent transaction explosion
+  const updates: ReturnType<typeof db.userProfile.update>[] = [];
+  candidates.forEach((candidate, index) => {
     const rank = index + 1;
-    return db.userProfile.update({
-      where: { id: candidate.profileId },
-      data: {
-        collegeRank: rank,
-        weightedScore: candidate.isSynced ? candidate.weightedScore : 0,
-      },
-    });
+    const targetScore = candidate.isSynced ? candidate.weightedScore : 0;
+    const scoreDiff = Math.abs((candidate.currentWeightedScore ?? -1) - targetScore);
+
+    if (candidate.currentCollegeRank !== rank || scoreDiff > 0.001) {
+      updates.push(
+        db.userProfile.update({
+          where: { id: candidate.profileId },
+          data: {
+            collegeRank: rank,
+            weightedScore: targetScore,
+          },
+        })
+      );
+    }
   });
 
   // Clear ranks for disabled or deactivated accounts
@@ -171,7 +183,11 @@ export async function recalculateAllCollegeRanks(): Promise<{ totalRanked: numbe
     },
   });
 
-  await db.$transaction([...updates, clearDisabled]);
+  if (updates.length > 0) {
+    await db.$transaction([...updates, clearDisabled]);
+  } else {
+    await clearDisabled;
+  }
 
   return { totalRanked: candidates.length };
 }

@@ -6,6 +6,8 @@ import {
   SyncErrorCategory,
 } from "@/lib/sync-circuit-breaker";
 import { syncUserLeetCodeData, STALE_THRESHOLD_HOURS } from "./leetcode/sync.service";
+import { recalculateAllCollegeRanks } from "./ranking.service";
+import { recomputeAllGenderWarAggregates } from "./gender-war.service";
 import { recordAuditLog } from "./audit.service";
 
 export interface SyncHealthMetrics {
@@ -169,7 +171,7 @@ export async function triggerUserManualSync(
   }
 
   // 3. Execute sync
-  const result = await syncUserLeetCodeData(account.id);
+  const result = await syncUserLeetCodeData(account.id, { triggerAggregations: true });
   globalSyncCircuitBreaker.recordResult(result.success, result.error);
 
   // 4. Record immutable audit log
@@ -260,19 +262,28 @@ export async function triggerPlatformBatchSync(
       }
 
       try {
-        const res = await syncUserLeetCodeData(acc.id);
+        const res = await syncUserLeetCodeData(acc.id, { triggerAggregations: false });
         globalSyncCircuitBreaker.recordResult(res.success, res.error);
         if (res.success) {
           successCount++;
         } else {
           failedCount++;
         }
-      } catch (err) {
+      } catch {
         failedCount++;
       }
 
       // Throttle delay: 250ms between requests to respect remote rate limits
       await new Promise((resolve) => setTimeout(resolve, 250));
+    }
+
+    if (successCount > 0) {
+      try {
+        await recalculateAllCollegeRanks();
+        await recomputeAllGenderWarAggregates();
+      } catch (aggErr) {
+        console.error("[BatchSync] Error during post-batch aggregations:", aggErr);
+      }
     }
 
     console.log(`[BatchSync] Completed: ${successCount} successful, ${failedCount} failed of ${totalTargeted}`);

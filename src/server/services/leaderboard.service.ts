@@ -16,69 +16,92 @@ export async function getLeaderboardData(
 
   // 1. Base query condition: Only active users with a linked LeetCode account
   // Note: Email is NEVER included in queries or public DTOs per Constitution.
-  const activeUsers = await db.user.findMany({
-    where: {
-      status: 'ACTIVE',
-      profile: { isNot: null },
-      codingAccounts: {
-        some: {
-          platform: 'LEETCODE',
+  const profileWhere: Record<string, unknown> = {};
+  if (params.gender && (params.gender === 'MALE' || params.gender === 'FEMALE')) {
+    profileWhere.gender = params.gender;
+  }
+  if (params.branch && params.branch.trim() !== '' && params.branch !== 'ALL') {
+    profileWhere.branch = { equals: params.branch.trim(), mode: 'insensitive' };
+  }
+  if (params.batch && params.batch !== 'ALL') {
+    const batchYear = Number(params.batch);
+    if (!isNaN(batchYear)) {
+      profileWhere.OR = [
+        { admissionYear: batchYear },
+        { graduationYear: batchYear },
+      ];
+    }
+  }
+
+  // Execute activeUsers and latest platform sync queries in parallel with relation joins
+  const [activeUsers, latestSyncAccount] = await Promise.all([
+    db.user.findMany({
+      relationLoadStrategy: 'join',
+      where: {
+        status: 'ACTIVE',
+        profile: {
+          isNot: null,
+          ...profileWhere,
+        },
+        codingAccounts: {
+          some: {
+            platform: 'LEETCODE',
+          },
         },
       },
-    },
-    select: {
-      id: true,
-      createdAt: true,
-      profile: {
-        select: {
-          id: true,
-          displayName: true,
-          gender: true,
-          leetcodeUsername: true,
-          admissionYear: true,
-          graduationYear: true,
-          branch: true,
-          avatarUrl: true,
-          collegeRank: true,
-          weightedScore: true,
+      select: {
+        id: true,
+        createdAt: true,
+        profile: {
+          select: {
+            id: true,
+            displayName: true,
+            gender: true,
+            leetcodeUsername: true,
+            admissionYear: true,
+            graduationYear: true,
+            branch: true,
+            avatarUrl: true,
+            collegeRank: true,
+            weightedScore: true,
+          },
         },
-      },
-      codingAccounts: {
-        where: { platform: 'LEETCODE' },
-        select: {
-          id: true,
-          username: true,
-          syncStatus: true,
-          lastSyncAt: true,
-          statistics: {
-            select: {
-              totalSolved: true,
-              easySolved: true,
-              mediumSolved: true,
-              hardSolved: true,
-              contestRating: true,
-              globalContestRank: true,
-              contestsAttended: true,
-              submissionCalendarJson: true,
+        codingAccounts: {
+          where: { platform: 'LEETCODE' },
+          select: {
+            id: true,
+            username: true,
+            syncStatus: true,
+            lastSyncAt: true,
+            statistics: {
+              select: {
+                totalSolved: true,
+                easySolved: true,
+                mediumSolved: true,
+                hardSolved: true,
+                contestRating: true,
+                globalContestRank: true,
+                contestsAttended: true,
+                submissionCalendarJson: true,
+              },
+            },
+            submissions: {
+              orderBy: { timestamp: 'desc' },
+              take: 1,
+              select: { timestamp: true },
             },
           },
-          submissions: {
-            orderBy: { timestamp: 'desc' },
-            take: 1,
-            select: { timestamp: true },
-          },
+          take: 1,
         },
-        take: 1,
       },
-    },
-  });
+    }),
+    db.linkedCodingAccount.findFirst({
+      where: { syncStatus: 'SUCCESS' },
+      orderBy: { lastSyncAt: 'desc' },
+      select: { lastSyncAt: true },
+    }),
+  ]);
 
-  // Get most recent platform-wide successful sync timestamp (FR-240)
-  const latestSyncAccount = await db.linkedCodingAccount.findFirst({
-    where: { syncStatus: 'SUCCESS' },
-    orderBy: { lastSyncAt: 'desc' },
-    select: { lastSyncAt: true },
-  });
   const lastPlatformSyncAt = latestSyncAccount?.lastSyncAt?.toISOString() ?? null;
 
   // 2. Map users to LeaderboardRowDTO

@@ -5,11 +5,12 @@ import { LeaderboardFilterParams, LeaderboardSortDimension, LeaderboardSortDirec
 import { LeaderboardFilters } from "@/components/leaderboard/LeaderboardFilters";
 import { LeaderboardTable } from "@/components/leaderboard/LeaderboardTable";
 import { LeaderboardRefreshButton } from "@/components/leaderboard/LeaderboardRefreshButton";
+import { LeaderboardHero } from "@/components/leaderboard/LeaderboardHero";
 import { Navbar } from "@/components/layout/Navbar";
 import { SessionProvider } from "@/components/auth/SessionProvider";
 
 export const metadata = {
-  title: "College Leaderboard \u2014 CodeRank",
+  title: "College Leaderboard — CodeRank",
   description: "Collegiate competitive coding ranking and LeetCode performance index.",
 };
 
@@ -58,43 +59,32 @@ export default async function HomePage({ searchParams }: HomePageProps) {
     getLeaderboardData(filterParams),
   ]);
 
-  return (
-    <SessionProvider>
-      <div className="min-h-screen flex flex-col bg-[#0b0f14] text-[#ece8e1] relative selection:bg-[#c89b68]/30 selection:text-[#f3cf98]">
-        {/* Subtle ambient lighting: deep petrol & warm camel glow */}
-        <div
-          aria-hidden="true"
-          className="pointer-events-none fixed inset-0 -z-10 overflow-hidden opacity-60"
-        >
-          <div
-            className="absolute -top-32 -left-40 h-[600px] w-[600px] rounded-full blur-3xl"
-            style={{ background: "radial-gradient(circle, rgba(34, 81, 94, 0.22) 0%, transparent 70%)" }}
-          />
-          <div
-            className="absolute top-20 right-0 h-[500px] w-[500px] rounded-full blur-3xl"
-            style={{ background: "radial-gradient(circle, rgba(200, 155, 104, 0.08) 0%, transparent 70%)" }}
-          />
-        </div>
+  const topStudent = leaderboardData.students[0];
 
+  return (
+    <SessionProvider session={session}>
+      <div className="min-h-screen flex flex-col bg-[#faf8f5] dark:bg-[#090d16] text-[#1c1917] dark:text-[#f1f5f9] relative selection:bg-blue-600 selection:text-white transition-colors duration-200">
         <Navbar />
 
+        {/* Clean Hero Section */}
+        <LeaderboardHero topStudent={topStudent} totalCoders={leaderboardData.total} />
+
+        {/* Main Canvas */}
         <main className="flex-1 py-8 px-4 sm:px-6 lg:px-8 max-w-7xl mx-auto w-full">
-          <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-4 mb-6">
-            <h1 className="font-display text-2xl sm:text-3xl font-bold tracking-tight text-[#ece8e1]">
-              College Coding Leaderboard
-            </h1>
+          {/* Quick bar with refresh */}
+          <div className="flex items-center justify-end mb-4">
             <LeaderboardRefreshButton lastPlatformSyncAt={leaderboardData.lastPlatformSyncAt} />
           </div>
 
-          <div className="flex flex-col lg:flex-row gap-6 items-start">
-            <aside className="w-full lg:w-64 xl:w-72 shrink-0 lg:sticky lg:top-6">
-              <Suspense fallback={<div className="h-96 rounded-xl bg-[#121820] animate-pulse" />}>
+          <div className="flex flex-col lg:flex-row gap-8 items-start">
+            <aside className="w-full lg:w-72 xl:w-80 shrink-0 lg:sticky lg:top-20">
+              <Suspense fallback={<div className="h-96 rounded-2xl bg-white dark:bg-slate-900 border border-slate-200 dark:border-slate-800 animate-pulse" />}>
                 <LeaderboardFilters currentFilters={filterParams} />
               </Suspense>
             </aside>
 
             <section className="flex-1 min-w-0 w-full">
-              <Suspense fallback={<div className="h-96 rounded-xl bg-[#121820] animate-pulse" />}>
+              <Suspense fallback={<div className="h-96 rounded-2xl bg-white dark:bg-slate-900 border border-slate-200 dark:border-slate-800 animate-pulse" />}>
                 <LeaderboardTable
                   data={leaderboardData}
                   currentUserId={session?.user?.id}

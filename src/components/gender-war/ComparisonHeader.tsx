@@ -40,24 +40,31 @@ export function ComparisonHeader({ currentWindow, computedAt }: ComparisonHeader
   };
 
   return (
-    <div className="flex flex-col md:flex-row md:items-center justify-between gap-4 mb-6 pb-4 border-b border-[#21262d]">
+    <div className="flex flex-col md:flex-row md:items-center justify-between gap-4 mb-6 pb-4 border-b border-stone-200 dark:border-slate-800">
       <div className="flex flex-wrap items-center gap-1.5 text-xs">
-        {WINDOWS.map((item, index) => {
+        {WINDOWS.map((item) => {
           const isActive = item.value === currentWindow;
           return (
-            <span key={item.value} className="inline-flex items-center">
-              <button onClick={() => handleWindowChange(item.value)} disabled={isPending}
-                className={`font-display font-semibold transition-all px-2.5 py-1 rounded-md ${
-                  isActive ? "bg-[#21262d] text-[#e6edf3]" : "text-[#848d97] hover:text-[#e6edf3] hover:bg-[#161b22]"
-                }`}>
-                {item.label}
-              </button>
-              {index < WINDOWS.length - 1 && <span className="text-[#30363d] px-1 select-none">|</span>}
-            </span>
+            <button
+              key={item.value}
+              onClick={() => handleWindowChange(item.value)}
+              disabled={isPending}
+              className={`font-display text-xs font-bold transition-all px-3.5 py-1.5 rounded-full ${
+                isActive
+                  ? "bg-stone-900 dark:bg-white text-white dark:text-stone-900 shadow-sm"
+                  : "text-stone-600 dark:text-slate-400 hover:text-stone-900 dark:hover:text-white hover:bg-stone-100 dark:hover:bg-slate-800"
+              }`}
+            >
+              {item.label}
+            </button>
           );
         })}
       </div>
-      {computedAt && <div className="text-xs text-[#6e7681]">Updated {formatComputedAt(computedAt)}</div>}
+      {computedAt && (
+        <span className="text-[11px] text-stone-400 dark:text-slate-500 font-medium">
+          Updated {formatComputedAt(computedAt)}
+        </span>
+      )}
     </div>
   );
 }

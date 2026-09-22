@@ -35,7 +35,7 @@ export async function syncNow() {
     }
   }
 
-  const result = await syncUserLeetCodeData(account.id);
+  const result = await syncUserLeetCodeData(account.id, { triggerAggregations: true });
 
   revalidatePath("/dashboard");
   revalidatePath(`/profiles/${account.username}`);

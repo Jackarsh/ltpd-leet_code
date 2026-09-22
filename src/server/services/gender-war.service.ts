@@ -394,64 +394,55 @@ export async function computeAndPersistAggregates(
 
   // 3. Compute all metrics
   const metrics = computeGroupMetrics(gender, timeWindow, periodId, participants);
+  const normalizedPeriodId = periodId ? periodId : null;
 
-  // 4. Upsert into GenderWarAggregate (FR-416)
-  await db.genderWarAggregate.upsert({
+  // 4. Persist into GenderWarAggregate (FR-416)
+  const existing = await db.genderWarAggregate.findFirst({
     where: {
-      gender_timeWindow_periodId: {
-        gender: gender as 'MALE' | 'FEMALE',
-        timeWindow,
-        periodId: periodId ?? '',
-      },
-    },
-    create: {
       gender: gender as 'MALE' | 'FEMALE',
       timeWindow,
-      periodId,
-      participantCount: metrics.participantCount,
-      totalSolved: metrics.totalSolved,
-      avgSolvedPerStudent: metrics.avgSolvedPerStudent,
-      totalHard: metrics.totalHard,
-      avgHardPerStudent: metrics.avgHardPerStudent,
-      totalMedium: metrics.totalMedium,
-      avgMediumPerStudent: metrics.avgMediumPerStudent,
-      totalEasy: metrics.totalEasy,
-      avgEasyPerStudent: metrics.avgEasyPerStudent,
-      totalContestsAttended: metrics.totalContestsAttended,
-      avgContestsPerStudent: metrics.avgContestsPerStudent,
-      ratedParticipantCount: metrics.ratedParticipantCount,
-      avgContestRating: metrics.avgContestRating,
-      activeCodersCount: metrics.activeCodersCount,
-      recentSubmissionsCount: metrics.recentSubmissionsCount,
-      avgStreakDays: metrics.avgStreakDays,
-      isLowSampleSize: metrics.isLowSampleSize,
-      hasStaleData: metrics.hasStaleData,
-      pendingDataCount: metrics.pendingDataCount,
-      computedAt: new Date(metrics.computedAt),
-    },
-    update: {
-      participantCount: metrics.participantCount,
-      totalSolved: metrics.totalSolved,
-      avgSolvedPerStudent: metrics.avgSolvedPerStudent,
-      totalHard: metrics.totalHard,
-      avgHardPerStudent: metrics.avgHardPerStudent,
-      totalMedium: metrics.totalMedium,
-      avgMediumPerStudent: metrics.avgMediumPerStudent,
-      totalEasy: metrics.totalEasy,
-      avgEasyPerStudent: metrics.avgEasyPerStudent,
-      totalContestsAttended: metrics.totalContestsAttended,
-      avgContestsPerStudent: metrics.avgContestsPerStudent,
-      ratedParticipantCount: metrics.ratedParticipantCount,
-      avgContestRating: metrics.avgContestRating,
-      activeCodersCount: metrics.activeCodersCount,
-      recentSubmissionsCount: metrics.recentSubmissionsCount,
-      avgStreakDays: metrics.avgStreakDays,
-      isLowSampleSize: metrics.isLowSampleSize,
-      hasStaleData: metrics.hasStaleData,
-      pendingDataCount: metrics.pendingDataCount,
-      computedAt: new Date(metrics.computedAt),
+      periodId: normalizedPeriodId,
     },
   });
+
+  const payload = {
+    participantCount: metrics.participantCount,
+    totalSolved: metrics.totalSolved,
+    avgSolvedPerStudent: metrics.avgSolvedPerStudent,
+    totalHard: metrics.totalHard,
+    avgHardPerStudent: metrics.avgHardPerStudent,
+    totalMedium: metrics.totalMedium,
+    avgMediumPerStudent: metrics.avgMediumPerStudent,
+    totalEasy: metrics.totalEasy,
+    avgEasyPerStudent: metrics.avgEasyPerStudent,
+    totalContestsAttended: metrics.totalContestsAttended,
+    avgContestsPerStudent: metrics.avgContestsPerStudent,
+    ratedParticipantCount: metrics.ratedParticipantCount,
+    avgContestRating: metrics.avgContestRating,
+    activeCodersCount: metrics.activeCodersCount,
+    recentSubmissionsCount: metrics.recentSubmissionsCount,
+    avgStreakDays: metrics.avgStreakDays,
+    isLowSampleSize: metrics.isLowSampleSize,
+    hasStaleData: metrics.hasStaleData,
+    pendingDataCount: metrics.pendingDataCount,
+    computedAt: new Date(metrics.computedAt),
+  };
+
+  if (existing) {
+    await db.genderWarAggregate.update({
+      where: { id: existing.id },
+      data: payload,
+    });
+  } else {
+    await db.genderWarAggregate.create({
+      data: {
+        gender: gender as 'MALE' | 'FEMALE',
+        timeWindow,
+        periodId: normalizedPeriodId,
+        ...payload,
+      },
+    });
+  }
 
   return metrics;
 }
@@ -478,14 +469,14 @@ export async function getCachedAggregate(
     return memCached;
   }
 
-  const row = await db.genderWarAggregate.findUnique({
+  const normalizedPeriodId = periodId ? periodId : null;
+  const row = await db.genderWarAggregate.findFirst({
     where: {
-      gender_timeWindow_periodId: {
-        gender: gender as 'MALE' | 'FEMALE',
-        timeWindow,
-        periodId: periodId ?? '',
-      },
+      gender: gender as 'MALE' | 'FEMALE',
+      timeWindow,
+      periodId: normalizedPeriodId,
     },
+    orderBy: { computedAt: 'desc' },
   });
 
   if (!row) {
@@ -542,6 +533,7 @@ export async function getWithinGroupLeaderboard(
   }
 
   const users = await db.user.findMany({
+    relationLoadStrategy: 'join',
     where: {
       status: 'ACTIVE',
       profile: { gender: gender as 'MALE' | 'FEMALE' },

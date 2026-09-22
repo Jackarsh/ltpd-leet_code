@@ -3,11 +3,18 @@ import { DEFAULT_ACHIEVEMENTS } from "@/lib/default-achievements";
 import { evaluateCondition, RuleVariables } from "./achievement-rule.service";
 import { calculateCurrentStreak } from "@/lib/activity-utils";
 import { UserBadgeDTO } from "@/types/profile";
+// In-memory memoization flag to prevent 15 redundant DB upserts per sync
+let defaultAchievementsSeeded = false;
 
 /**
  * Ensures default collegiate achievements exist in the database.
+ * Memoized in-memory to prevent redundant database upserts on every evaluation.
  */
-export async function ensureDefaultAchievementsExist() {
+export async function ensureDefaultAchievementsExist(force = false) {
+  if (defaultAchievementsSeeded && !force) {
+    return;
+  }
+
   for (const def of DEFAULT_ACHIEVEMENTS) {
     await db.achievement.upsert({
       where: { slug: def.slug },
@@ -29,6 +36,8 @@ export async function ensureDefaultAchievementsExist() {
       },
     });
   }
+
+  defaultAchievementsSeeded = true;
 }
 
 /**

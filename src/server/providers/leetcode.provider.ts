@@ -13,48 +13,71 @@ import { ParsedLeetCodeData } from "@/types/leetcode";
 import { leetCodeRateLimiter } from "@/lib/rate-limiter";
 
 export class LeetCodeProvider implements ICodingPlatformProvider {
+  private inFlight = new Map<string, Promise<unknown>>();
+  private cache = new Map<string, { data: unknown; expiresAt: number }>();
+  private readonly CACHE_TTL_MS = 60 * 1000;
+
   private async executeGraphQL<T>(query: string, variables: Record<string, unknown>): Promise<T> {
-    await leetCodeRateLimiter.acquire();
-
-    try {
-      const response = await fetch(LEETCODE_GRAPHQL_ENDPOINT, {
-        method: "POST",
-        headers: {
-          "Content-Type": "application/json",
-          "User-Agent": "Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/120.0.0.0 Safari/537.36",
-          Referer: "https://leetcode.com",
-        },
-        body: JSON.stringify({ query, variables }),
-        next: { revalidate: 0 },
-      });
-
-      if (response.status === 429) {
-        leetCodeRateLimiter.trip(60);
-        throw new RateLimitError(60);
-      }
-
-      if (!response.ok) {
-        throw new ProviderUnavailableError(`HTTP error ${response.status} from LeetCode`);
-      }
-
-      const json = await response.json();
-
-      if (json.errors && json.errors.length > 0) {
-        const msg = json.errors[0]?.message || "Unknown GraphQL error";
-        if (msg.includes("does not exist")) {
-          throw new UserNotFoundError(String(variables.username));
-        }
-        throw new ProviderUnavailableError(msg);
-      }
-
-      return json.data as T;
-    } catch (err: unknown) {
-      if (err instanceof UserNotFoundError || err instanceof RateLimitError || err instanceof ProviderUnavailableError) {
-        throw err;
-      }
-      const message = err instanceof Error ? err.message : String(err);
-      throw new ProviderUnavailableError(message);
+    const cacheKey = `${query.slice(0, 30)}:${JSON.stringify(variables)}`;
+    const cached = this.cache.get(cacheKey);
+    if (cached && Date.now() < cached.expiresAt) {
+      return cached.data as T;
     }
+
+    if (this.inFlight.has(cacheKey)) {
+      return this.inFlight.get(cacheKey) as Promise<T>;
+    }
+
+    const promise = (async () => {
+      await leetCodeRateLimiter.acquire();
+
+      try {
+        const response = await fetch(LEETCODE_GRAPHQL_ENDPOINT, {
+          method: "POST",
+          headers: {
+            "Content-Type": "application/json",
+            "User-Agent": "Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/120.0.0.0 Safari/537.36",
+            Referer: "https://leetcode.com",
+          },
+          body: JSON.stringify({ query, variables }),
+          next: { revalidate: 0 },
+        });
+
+        if (response.status === 429) {
+          leetCodeRateLimiter.trip(60);
+          throw new RateLimitError(60);
+        }
+
+        if (!response.ok) {
+          throw new ProviderUnavailableError(`HTTP error ${response.status} from LeetCode`);
+        }
+
+        const json = await response.json();
+
+        if (json.errors && json.errors.length > 0) {
+          const msg = json.errors[0]?.message || "Unknown GraphQL error";
+          if (msg.includes("does not exist")) {
+            throw new UserNotFoundError(String(variables.username));
+          }
+          throw new ProviderUnavailableError(msg);
+        }
+
+        const result = json.data as T;
+        this.cache.set(cacheKey, { data: result, expiresAt: Date.now() + this.CACHE_TTL_MS });
+        return result;
+      } catch (err: unknown) {
+        if (err instanceof UserNotFoundError || err instanceof RateLimitError || err instanceof ProviderUnavailableError) {
+          throw err;
+        }
+        const message = err instanceof Error ? err.message : String(err);
+        throw new ProviderUnavailableError(message);
+      } finally {
+        this.inFlight.delete(cacheKey);
+      }
+    })();
+
+    this.inFlight.set(cacheKey, promise);
+    return promise;
   }
 
   public async validateUser(username: string): Promise<boolean> {

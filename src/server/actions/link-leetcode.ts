@@ -70,7 +70,7 @@ export async function linkLeetCodeAccount(values: { username: string }) {
 
   // Await initial sync so stats are populated immediately
   try {
-    await syncUserLeetCodeData(linked.id);
+    await syncUserLeetCodeData(linked.id, { triggerAggregations: true });
   } catch (err) {
     console.error("Initial sync error:", err);
   }

@@ -8,32 +8,76 @@ import { WithinGroupLeaderboards } from "@/components/gender-war/WithinGroupLead
 import type { GenderWarTimeWindow } from "@/types/gender-war";
 
 export const metadata: Metadata = {
-  title: "Gender War | CodeRank",
+  title: "Gender War Arena | CodeRank",
   description: "Transparent, size-normalized coding performance comparison between Male and Female students.",
 };
 export const revalidate = 300;
 
-const VALID_WINDOWS: GenderWarTimeWindow[] = ["CURRENT_WEEK", "CURRENT_MONTH", "SEMESTER", "ACADEMIC_YEAR", "ALL_TIME"];
+const VALID_WINDOWS: GenderWarTimeWindow[] = [
+  "CURRENT_WEEK",
+  "CURRENT_MONTH",
+  "SEMESTER",
+  "ACADEMIC_YEAR",
+  "ALL_TIME",
+];
 
-interface GenderWarPageProps { searchParams: Promise<{ [key: string]: string | string[] | undefined }>; }
+interface GenderWarPageProps {
+  searchParams: Promise<{ [key: string]: string | string[] | undefined }>;
+}
 
 export default async function GenderWarPage({ searchParams }: GenderWarPageProps) {
   const resolved = await searchParams;
   const rawPeriod = (resolved.period as string) ?? "ALL_TIME";
-  const timeWindow: GenderWarTimeWindow = VALID_WINDOWS.includes(rawPeriod as GenderWarTimeWindow) ? (rawPeriod as GenderWarTimeWindow) : "ALL_TIME";
+  const timeWindow: GenderWarTimeWindow = VALID_WINDOWS.includes(rawPeriod as GenderWarTimeWindow)
+    ? (rawPeriod as GenderWarTimeWindow)
+    : "ALL_TIME";
   const periodId = (resolved.periodId as string) ?? null;
   const data = await getGenderWarData(timeWindow, periodId);
 
   return (
-    <div className="min-h-screen bg-[#0d1117] text-[#e6edf3]">
-      <div className="mx-auto max-w-7xl px-4 py-8 sm:px-6 lg:px-8 space-y-8">
-        <Suspense fallback={<div className="space-y-3"><div className="h-9 w-64 rounded-lg bg-[#161b22] animate-pulse" /></div>}>
+    <div className="min-h-screen bg-[#faf8f5] dark:bg-[#090d16] text-[#1c1917] dark:text-[#f1f5f9] py-8 px-4 sm:px-6 lg:px-8 max-w-7xl mx-auto transition-colors duration-200">
+      {/* Page Title & Header */}
+      <div className="mb-6">
+        <div className="inline-flex items-center gap-2 px-3 py-1 rounded-full border border-stone-200 dark:border-slate-800 bg-white dark:bg-slate-900 text-stone-700 dark:text-stone-300 text-xs font-bold mb-3 shadow-sm">
+          <span>COHORT BATTLEGROUND</span>
+        </div>
+        <h1 className="font-display text-3xl sm:text-4xl font-black uppercase tracking-tight text-stone-900 dark:text-white">
+          Gender War Arena
+        </h1>
+        <p className="mt-1.5 text-sm text-stone-600 dark:text-slate-400 max-w-2xl font-medium">
+          Transparent, sample-size normalized performance analysis comparing male and female engineering cohorts across LeetCode solve counts and contest ratings.
+        </p>
+      </div>
+
+      <div className="space-y-8">
+        <Suspense
+          fallback={
+            <div className="space-y-3">
+              <div className="h-9 w-64 rounded-full bg-stone-200 animate-pulse" />
+            </div>
+          }
+        >
           <ComparisonHeader currentWindow={timeWindow} computedAt={data.computedAt} />
         </Suspense>
+
         <SymmetricalPanels male={data.male} female={data.female} />
+
         <MetricComparisonCharts male={data.male} female={data.female} />
-        <Suspense fallback={<div className="grid grid-cols-1 gap-4 md:grid-cols-2"><div className="h-80 rounded-xl bg-[#161b22] animate-pulse" /><div className="h-80 rounded-xl bg-[#161b22] animate-pulse" /></div>}>
-          <WithinGroupLeaderboards maleTop10={data.maleTop10} femaleTop10={data.femaleTop10} maleParticipantCount={data.male.participantCount} femaleParticipantCount={data.female.participantCount} />
+
+        <Suspense
+          fallback={
+            <div className="grid grid-cols-1 gap-6 md:grid-cols-2">
+              <div className="h-80 rounded-2xl bg-white border border-stone-200 animate-pulse" />
+              <div className="h-80 rounded-2xl bg-white border border-stone-200 animate-pulse" />
+            </div>
+          }
+        >
+          <WithinGroupLeaderboards
+            maleTop10={data.maleTop10}
+            femaleTop10={data.femaleTop10}
+            maleParticipantCount={data.male.participantCount}
+            femaleParticipantCount={data.female.participantCount}
+          />
         </Suspense>
       </div>
     </div>

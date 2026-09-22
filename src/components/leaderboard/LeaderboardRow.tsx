@@ -2,7 +2,7 @@
 
 import { useState } from "react";
 import Link from "next/link";
-import { Info, ExternalLink } from "lucide-react";
+import { Info, ExternalLink, Star, Trophy, Flame } from "lucide-react";
 import { LeaderboardRowDTO } from "@/types/leaderboard";
 import { RankingFormulaModal } from "@/components/leaderboard/RankingFormulaModal";
 
@@ -22,48 +22,45 @@ export function LeaderboardRow({ row, isCurrentUser = false }: LeaderboardRowPro
     .filter(Boolean)
     .join(" \u00B7 ");
 
-  const formatRelativeTime = (isoString: string | null) => {
-    if (!isoString) return null;
-    const date = new Date(isoString);
-    const diffHours = Math.floor((Date.now() - date.getTime()) / (1000 * 60 * 60));
-    if (diffHours < 1) return "Just now";
-    if (diffHours < 24) return `${diffHours}h ago`;
-    const diffDays = Math.floor(diffHours / 24);
-    return `${diffDays}d ago`;
-  };
-
-  const getRankBadgeStyle = (rank?: number | null) => {
-    if (rank === 1) return "bg-[#c89b68]/20 text-[#f3cf98] border-[#c89b68]/50 shadow-sm shadow-[#c89b68]/10";
-    if (rank === 2) return "bg-[#3a4959]/35 text-[#d8e2ec] border-[#4f6479]/50";
-    if (rank === 3) return "bg-[#8c5e32]/25 text-[#e4b285] border-[#8c5e32]/50";
-    return "bg-[#18212b] text-[#8d98a5] border-[#25303e]";
+  const getRankBadgeClass = (rank?: number | null) => {
+    if (rank === 1) {
+      return "bg-blue-600 text-white ring-2 ring-amber-400 shadow-md";
+    }
+    if (rank === 2) {
+      return "bg-blue-600 text-white ring-2 ring-slate-300 shadow-sm";
+    }
+    if (rank === 3) {
+      return "bg-blue-600 text-white ring-2 ring-amber-600/60 shadow-sm";
+    }
+    return "bg-blue-600 text-white";
   };
 
   return (
     <>
       <div
-        className={`card-hover relative flex flex-col sm:flex-row sm:items-center justify-between gap-4 p-4 rounded-xl border transition-all ${
+        className={`card-hover relative flex flex-col sm:flex-row sm:items-center justify-between gap-4 p-4 sm:p-5 rounded-2xl border transition-all ${
           isCurrentUser
-            ? "border-[#c89b68]/50 bg-[#141c26] ring-1 ring-[#c89b68]/30 shadow-md shadow-black/30"
-            : "border-[#1e2632] bg-[#121820] hover:border-[#384a5e] shadow-sm shadow-black/20"
+            ? "border-blue-500 bg-blue-50/30 dark:bg-blue-950/20 ring-2 ring-blue-500/20 shadow-md"
+            : "border-slate-200/90 dark:border-slate-800 bg-white dark:bg-slate-900 hover:border-blue-400/50 dark:hover:border-blue-500/50 shadow-sm"
         }`}
       >
-        {/* Left: Avatar + Info */}
-        <div className="flex items-center gap-3.5 min-w-0">
-          <div className="shrink-0">
+        {/* Left: Avatar + Identity + Stats */}
+        <div className="flex items-start sm:items-center gap-4 min-w-0 flex-1">
+          {/* Avatar container (IMDb movie poster style) */}
+          <div className="shrink-0 relative">
             <Link href={`/profiles/${encodeURIComponent(row.leetcodeUsername)}`}>
-              <div className="h-14 w-14 rounded-lg overflow-hidden border border-[#1e2632] bg-[#0b0f14] flex items-center justify-center">
+              <div className="h-16 w-16 sm:h-20 sm:w-20 rounded-xl overflow-hidden border border-slate-200 dark:border-slate-700 bg-slate-100 dark:bg-slate-800 flex items-center justify-center shadow-inner group">
                 {row.avatarUrl ? (
                   <img
                     src={row.avatarUrl}
                     alt={row.displayName}
-                    className="h-full w-full object-cover"
+                    className="h-full w-full object-cover group-hover:scale-105 transition-transform duration-200"
                     onError={(e) => {
                       (e.target as HTMLElement).style.display = "none";
                     }}
                   />
                 ) : (
-                  <div className="h-full w-full flex items-center justify-center bg-[#18212b] text-[#f3cf98] font-display font-bold text-lg">
+                  <div className="h-full w-full flex items-center justify-center bg-slate-200 dark:bg-slate-700 text-slate-700 dark:text-slate-200 font-display font-black text-xl sm:text-2xl group-hover:bg-blue-100 group-hover:text-blue-700 transition-colors">
                     {row.displayName.charAt(0).toUpperCase()}
                   </div>
                 )}
@@ -71,100 +68,108 @@ export function LeaderboardRow({ row, isCurrentUser = false }: LeaderboardRowPro
             </Link>
           </div>
 
+          {/* Details Section */}
           <div className="min-w-0 flex-1">
+            {/* Top row: Rank badge + Student Name + Badges */}
             <div className="flex flex-wrap items-center gap-2 mb-1">
-              <span className={`inline-flex items-center px-2 py-0.5 rounded text-xs font-mono font-bold border ${getRankBadgeStyle(row.collegeRank)}`}>
+              <span
+                className={`inline-flex items-center px-2.5 py-0.5 rounded-md text-xs font-mono font-black tracking-wide ${getRankBadgeClass(
+                  row.collegeRank
+                )}`}
+              >
                 #{row.collegeRank ?? "—"}
               </span>
 
               <Link
                 href={`/profiles/${encodeURIComponent(row.leetcodeUsername)}`}
-                className="font-display text-base font-bold text-[#ece8e1] hover:text-[#e5b882] transition-colors truncate"
+                className="font-display text-base sm:text-lg font-black text-slate-900 dark:text-white hover:text-blue-600 dark:hover:text-blue-400 transition-colors truncate"
               >
                 {row.displayName}
               </Link>
 
               {isCurrentUser && (
-                <span className="inline-flex items-center px-2 py-0.5 rounded text-[10px] font-semibold bg-[#c89b68]/15 text-[#e5b882] border border-[#c89b68]/30">
+                <span className="inline-flex items-center px-2 py-0.5 rounded-full text-[10px] font-bold bg-blue-100 dark:bg-blue-950/60 text-blue-700 dark:text-blue-300 border border-blue-200 dark:border-blue-800">
                   You
                 </span>
               )}
 
               {row.isStale && (
-                <span className="text-[11px] text-[#6b7785] bg-[#18212b] px-1.5 py-0.5 rounded border border-[#25303e]">
+                <span className="text-[10px] font-semibold text-slate-500 dark:text-slate-400 bg-slate-100 dark:bg-slate-800 px-2 py-0.5 rounded-full border border-slate-200 dark:border-slate-700">
                   Stale
                 </span>
               )}
             </div>
 
-            <div className="text-xs text-[#8d98a5] flex flex-wrap items-center gap-1.5 mb-2">
+            {/* Academic metadata */}
+            <div className="text-xs text-slate-500 dark:text-slate-400 flex flex-wrap items-center gap-1.5 mb-2 font-medium">
               <span>{academicDetails}</span>
-              {row.lastSyncAt && (
-                <>
-                  <span>&middot;</span>
-                  <span>Synced {formatRelativeTime(row.lastSyncAt)}</span>
-                </>
-              )}
             </div>
 
-            <div className="flex flex-wrap items-center gap-x-4 gap-y-1 text-xs text-[#ece8e1]">
-              <div className="font-medium">
-                <span className="text-[#8d98a5]">Rating: </span>
-                <span className="font-mono font-bold text-[#ece8e1]">{row.contestRating ? Math.round(row.contestRating) : "Unrated"}</span>
+            {/* Metrics Chips Row */}
+            <div className="flex flex-wrap items-center gap-2 text-xs">
+              {/* Star Rating / Weighted Score */}
+              <div className="flex items-center gap-1 px-2.5 py-1 rounded-lg bg-amber-50 dark:bg-amber-950/40 border border-amber-200/80 dark:border-amber-800/60 text-amber-900 dark:text-amber-200 font-extrabold text-xs">
+                <Star className="h-3.5 w-3.5 fill-amber-500 text-amber-500" />
+                <span>{row.weightedScore ? row.weightedScore.toFixed(1) : "0.0"} pts</span>
               </div>
 
-              <div>
-                <span className="font-mono font-bold">{row.totalSolved ?? 0}</span>
-                <span className="text-[#8d98a5] ml-1">
-                  Solved (<span className="text-[#5fa999]">{row.easySolved ?? 0}E</span> &middot; <span className="text-[#d4a373]">{row.mediumSolved ?? 0}M</span> &middot; <span className="text-[#cf6679]">{row.hardSolved ?? 0}H</span>)
+              {/* Total Solved Chip */}
+              <div className="flex items-center gap-1 px-2.5 py-1 rounded-lg bg-slate-100 dark:bg-slate-800 border border-slate-200 dark:border-slate-700 text-slate-700 dark:text-slate-300 font-semibold text-xs">
+                <span className="font-mono font-bold text-slate-900 dark:text-white">{row.totalSolved ?? 0}</span>
+                <span className="text-slate-500 dark:text-slate-400">Solved</span>
+              </div>
+
+              {/* Solved breakdown E / M / H */}
+              <div className="hidden sm:flex items-center gap-1 font-mono text-[11px] font-bold">
+                <span className="px-1.5 py-0.5 rounded bg-emerald-50 dark:bg-emerald-950/40 text-emerald-700 dark:text-emerald-400 border border-emerald-200/60 dark:border-emerald-800/60">
+                  {row.easySolved ?? 0}E
+                </span>
+                <span className="px-1.5 py-0.5 rounded bg-amber-50 dark:bg-amber-950/40 text-amber-700 dark:text-amber-400 border border-amber-200/60 dark:border-amber-800/60">
+                  {row.mediumSolved ?? 0}M
+                </span>
+                <span className="px-1.5 py-0.5 rounded bg-rose-50 dark:bg-rose-950/40 text-rose-700 dark:text-rose-400 border border-rose-200/60 dark:border-rose-800/60">
+                  {row.hardSolved ?? 0}H
                 </span>
               </div>
 
-              {(row.currentStreak ?? 0) > 0 && (
-                <div className="text-[#8d98a5]">
-                  <span className="font-mono font-semibold text-[#e59866]">{row.currentStreak}d</span> streak
+              {/* Contest Rating */}
+              {row.contestRating ? (
+                <div className="hidden md:flex items-center gap-1 px-2.5 py-1 rounded-lg bg-indigo-50 dark:bg-indigo-950/40 border border-indigo-200/60 dark:border-indigo-800/60 text-indigo-700 dark:text-indigo-300 font-medium text-xs">
+                  <Trophy className="h-3 w-3 text-indigo-500 dark:text-indigo-400" />
+                  <span>{Math.round(row.contestRating)} Rating</span>
                 </div>
-              )}
+              ) : null}
 
-              <div className="hidden md:flex items-center gap-3 pl-2 border-l border-[#25303e]">
-                <Link
-                  href={`/profiles/${encodeURIComponent(row.leetcodeUsername)}`}
-                  className="text-[#8d98a5] hover:text-[#ece8e1] hover:underline text-[11px] font-medium"
-                >
-                  Profile
-                </Link>
-                <a
-                  href={`https://leetcode.com/u/${encodeURIComponent(row.leetcodeUsername)}`}
-                  target="_blank"
-                  rel="noopener noreferrer"
-                  className="text-[#8d98a5] hover:text-[#ece8e1] text-[11px] flex items-center gap-1"
-                >
-                  <span>LeetCode</span>
-                  <ExternalLink className="h-2.5 w-2.5" />
-                </a>
-              </div>
+              {/* Streak */}
+              {(row.currentStreak ?? 0) > 0 ? (
+                <div className="hidden md:flex items-center gap-1 px-2.5 py-1 rounded-lg bg-orange-50 dark:bg-orange-950/40 border border-orange-200/60 dark:border-orange-800/60 text-orange-700 dark:text-orange-300 font-medium text-xs">
+                  <Flame className="h-3 w-3 text-orange-500 dark:text-orange-400" />
+                  <span>{row.currentStreak}d</span>
+                </div>
+              ) : null}
             </div>
           </div>
         </div>
 
-        {/* Right: Score + Info */}
-        <div className="flex items-center justify-between sm:justify-end gap-3 pt-2 sm:pt-0 border-t sm:border-t-0 border-[#1e2632]">
-          <div className="text-left sm:text-right">
-            <div className="text-[10px] uppercase tracking-wider text-[#6b7785] font-semibold">
-              Score
-            </div>
-            <div className="font-mono text-base font-bold text-[#ece8e1]">
-              {row.weightedScore ? row.weightedScore.toFixed(1) : "0.0"}
-            </div>
-          </div>
+        {/* Right: Info modal trigger & profile action */}
+        <div className="flex sm:flex-col items-center sm:items-end justify-between sm:justify-center gap-2 pt-3 sm:pt-0 border-t sm:border-t-0 border-slate-100 dark:border-slate-800 shrink-0">
+          <div className="flex items-center gap-2">
+            <button
+              onClick={() => setShowFormulaModal(true)}
+              className="flex h-9 w-9 items-center justify-center rounded-full border border-slate-200 dark:border-slate-700 bg-slate-50 dark:bg-slate-800 text-slate-500 dark:text-slate-400 hover:text-blue-600 dark:hover:text-blue-400 hover:bg-blue-50 dark:hover:bg-blue-950/40 hover:border-blue-200 dark:hover:border-blue-800 transition-colors"
+              title="View Score Calculation Formula"
+            >
+              <Info className="h-4 w-4" />
+            </button>
 
-          <button
-            onClick={() => setShowFormulaModal(true)}
-            className="flex h-8 w-8 items-center justify-center rounded-full border border-[#25303e] bg-[#18212b] text-[#8d98a5] hover:text-[#ece8e1] hover:border-[#c89b68]/40 transition-colors"
-            title="View score formula"
-          >
-            <Info className="h-4 w-4" />
-          </button>
+            <Link
+              href={`/profiles/${encodeURIComponent(row.leetcodeUsername)}`}
+              className="px-3.5 py-1.5 rounded-full text-xs font-bold text-slate-700 dark:text-slate-300 hover:text-blue-600 dark:hover:text-blue-400 hover:bg-slate-100 dark:hover:bg-slate-800 border border-slate-200 dark:border-slate-700 transition-all flex items-center gap-1.5"
+            >
+              <span>Profile</span>
+              <ExternalLink className="h-3 w-3" />
+            </Link>
+          </div>
         </div>
       </div>
 

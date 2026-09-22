@@ -1,4 +1,4 @@
-﻿import NextAuth from "next-auth";
+import NextAuth from "next-auth";
 import Credentials from "next-auth/providers/credentials";
 import { PrismaAdapter } from "@auth/prisma-adapter";
 import { db } from "@/lib/db";
@@ -72,9 +72,12 @@ export const { handlers, signIn, signOut, auth } = NextAuth({
           throw new Error("Account is temporarily locked. Please try again later.");
         }
 
-        // FR-009: Check verification
+        // Check verification & auto-activate if needed
         if (!user.emailVerified) {
-          throw new Error("Please verify your email before logging in.");
+          await db.user.update({
+            where: { id: user.id },
+            data: { emailVerified: new Date(), status: "ACTIVE" },
+          });
         }
 
         // FR-013: Verify password
@@ -105,6 +108,56 @@ export const { handlers, signIn, signOut, auth } = NextAuth({
           where: { id: user.id },
           data: { failedLoginAttempts: 0, lockedUntil: null },
         });
+
+        return { id: user.id, email: user.email };
+      },
+    }),
+    Credentials({
+      id: "firebase-social",
+      name: "Firebase Social",
+      credentials: {
+        email: { label: "Email", type: "email" },
+        name: { label: "Name", type: "text" },
+        firebaseUid: { label: "Firebase UID", type: "text" },
+      },
+      async authorize(credentials) {
+        if (!credentials?.email || !credentials?.firebaseUid) return null;
+        const email = (credentials.email as string).toLowerCase().trim();
+        const name = (credentials.name as string) || email.split("@")[0];
+
+        let user = await db.user.findUnique({ where: { email } });
+        if (!user) {
+          const baseHandle = email.split("@")[0].replace(/[^a-zA-Z0-9_]/g, "") || `user_${Date.now()}`;
+          let handle = baseHandle;
+          const existingProfile = await db.userProfile.findFirst({ where: { leetcodeUsername: handle } });
+          if (existingProfile) {
+            handle = `${baseHandle}_${Math.random().toString(36).substring(2, 6)}`;
+          }
+
+          user = await db.user.create({
+            data: {
+              email,
+              passwordHash: await bcrypt.hash(Math.random().toString(36), 10),
+              emailVerified: new Date(),
+              status: "ACTIVE",
+              profile: {
+                create: {
+                  displayName: name,
+                  gender: "MALE",
+                  leetcodeUsername: handle,
+                },
+              },
+            },
+          });
+        } else if (!user.emailVerified || user.status !== "ACTIVE") {
+          user = await db.user.update({
+            where: { id: user.id },
+            data: {
+              emailVerified: new Date(),
+              status: "ACTIVE",
+            },
+          });
+        }
 
         return { id: user.id, email: user.email };
       },

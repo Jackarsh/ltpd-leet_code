@@ -42,21 +42,26 @@ export function SymmetricalPanels({ male, female }: SymmetricalPanelsProps) {
   return (
     <div className="space-y-6">
       {/* Commentary + Metric Selector */}
-      <div className="flex flex-col sm:flex-row items-start sm:items-center justify-between gap-3 p-4 rounded-xl border border-[#21262d] bg-[#161b22]">
+      <div className="flex flex-col sm:flex-row items-start sm:items-center justify-between gap-3 p-4 sm:p-5 rounded-2xl border border-stone-200/90 dark:border-slate-800 bg-white dark:bg-slate-900 shadow-sm transition-colors">
         <div className="text-sm">
-          <span className="font-semibold text-[#e6edf3]">{commentary}</span>
+          <span className="font-extrabold text-stone-900 dark:text-white">{commentary}</span>
         </div>
         <div className="flex items-center gap-1.5 self-end sm:self-auto">
-          <span className="text-[11px] text-[#6e7681] mr-1">Emotion Metric:</span>
+          <span className="text-xs font-semibold text-stone-500 dark:text-slate-400 mr-1 hidden sm:inline">Compare by:</span>
           {([
             { key: "SOLVED", label: "Avg Solved" },
             { key: "HARD", label: "Hard Solved" },
             { key: "RATING", label: "Contest Rating" },
           ] as const).map((m) => (
-            <button key={m.key} onClick={() => setActiveMetric(m.key)}
-              className={`px-2.5 py-1 rounded-md text-xs font-medium transition-all ${
-                activeMetric === m.key ? "bg-[#30363d] text-[#e6edf3]" : "bg-[#21262d] text-[#848d97] hover:text-[#e6edf3]"
-              }`}>
+            <button
+              key={m.key}
+              onClick={() => setActiveMetric(m.key)}
+              className={`px-3 py-1 rounded-full text-xs font-bold transition-all ${
+                activeMetric === m.key
+                  ? "bg-stone-900 dark:bg-white text-white dark:text-stone-900 shadow-sm"
+                  : "bg-stone-100 dark:bg-slate-800 text-stone-600 dark:text-slate-300 hover:text-stone-900 dark:hover:text-white hover:bg-stone-200 dark:hover:bg-slate-700"
+              }`}
+            >
               {m.label}
             </button>
           ))}
@@ -65,15 +70,17 @@ export function SymmetricalPanels({ male, female }: SymmetricalPanelsProps) {
 
       <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
         {/* Female Panel */}
-        <div className="card-hover relative flex flex-col justify-between p-6 rounded-2xl border border-[#21262d] bg-[#161b22]">
+        <div className="card-hover relative flex flex-col justify-between p-6 rounded-2xl border border-pink-200/80 dark:border-pink-900/60 bg-white dark:bg-slate-900 shadow-sm transition-colors">
           <div>
-            <div className="flex flex-col items-center justify-center pt-2 pb-4 border-b border-[#21262d]">
+            <div className="flex flex-col items-center justify-center pt-2 pb-5 border-b border-stone-100 dark:border-slate-800">
               <StickmanAvatar gender="FEMALE" emotion={femaleEmotion} size={95} />
-              <div className="mt-2 text-center">
-                <span className="inline-flex items-center px-2.5 py-0.5 rounded-full text-xs font-semibold bg-[#21262d] text-[#e6edf3] border border-[#30363d]">
+              <div className="mt-3 text-center">
+                <span className="inline-flex items-center px-3 py-1 rounded-full text-xs font-black uppercase tracking-wider bg-pink-50 dark:bg-pink-950/40 text-pink-700 dark:text-pink-300 border border-pink-200 dark:border-pink-800 shadow-sm">
                   Female Coders ({female.participantCount})
                 </span>
-                <p className="text-[11px] text-[#6e7681] mt-1 capitalize">Status: {femaleEmotion.toLowerCase().replace("_", " ")}</p>
+                <p className="text-xs font-medium text-stone-500 dark:text-slate-400 mt-1.5 capitalize">
+                  Status: <strong className="text-stone-700 dark:text-slate-200">{femaleEmotion.toLowerCase().replace("_", " ")}</strong>
+                </p>
               </div>
             </div>
             <div className="mt-5 space-y-3">
@@ -83,29 +90,31 @@ export function SymmetricalPanels({ male, female }: SymmetricalPanelsProps) {
                 { label: "Avg Contest Rating", val: female.avgContestRating ? String(Math.round(female.avgContestRating)) : "Unrated", bold: true },
                 { label: "Active Coders", val: `${female.activeCodersCount} / ${female.participantCount} (${female.participantCount > 0 ? Math.round((female.activeCodersCount / female.participantCount) * 100) : 0}%)`, bold: false },
               ].map((m) => (
-                <div key={m.label} className="flex items-center justify-between pb-2 border-b border-[#21262d]">
-                  <span className="text-xs text-[#848d97]">{m.label}</span>
-                  <span className={`font-mono text-${m.bold ? "base font-bold" : "sm font-semibold"} text-[#e6edf3]`}>{m.val}</span>
+                <div key={m.label} className="flex items-center justify-between pb-2.5 border-b border-stone-100 dark:border-slate-800">
+                  <span className="text-xs font-medium text-stone-500 dark:text-slate-400">{m.label}</span>
+                  <span className={`font-mono text-${m.bold ? "base font-black text-stone-900 dark:text-white" : "sm font-bold text-stone-800 dark:text-slate-200"}`}>{m.val}</span>
                 </div>
               ))}
               <div className="flex items-center justify-between pt-1">
-                <span className="text-xs text-[#848d97]">Total Group Solves</span>
-                <span className="font-mono text-xs font-semibold text-[#6e7681]">{fmtInt(female.totalSolved)} solves</span>
+                <span className="text-xs font-medium text-stone-500 dark:text-slate-400">Total Group Solves</span>
+                <span className="font-mono text-xs font-bold text-stone-600 dark:text-slate-400">{fmtInt(female.totalSolved)} solves</span>
               </div>
             </div>
           </div>
         </div>
 
         {/* Male Panel */}
-        <div className="card-hover relative flex flex-col justify-between p-6 rounded-2xl border border-[#21262d] bg-[#161b22]">
+        <div className="card-hover relative flex flex-col justify-between p-6 rounded-2xl border border-blue-200/80 dark:border-blue-900/60 bg-white dark:bg-slate-900 shadow-sm transition-colors">
           <div>
-            <div className="flex flex-col items-center justify-center pt-2 pb-4 border-b border-[#21262d]">
+            <div className="flex flex-col items-center justify-center pt-2 pb-5 border-b border-stone-100 dark:border-slate-800">
               <StickmanAvatar gender="MALE" emotion={maleEmotion} size={95} />
-              <div className="mt-2 text-center">
-                <span className="inline-flex items-center px-2.5 py-0.5 rounded-full text-xs font-semibold bg-[#21262d] text-[#e6edf3] border border-[#30363d]">
+              <div className="mt-3 text-center">
+                <span className="inline-flex items-center px-3 py-1 rounded-full text-xs font-black uppercase tracking-wider bg-blue-50 dark:bg-blue-950/40 text-blue-700 dark:text-blue-300 border border-blue-200 dark:border-blue-800 shadow-sm">
                   Male Coders ({male.participantCount})
                 </span>
-                <p className="text-[11px] text-[#6e7681] mt-1 capitalize">Status: {maleEmotion.toLowerCase().replace("_", " ")}</p>
+                <p className="text-xs font-medium text-stone-500 dark:text-slate-400 mt-1.5 capitalize">
+                  Status: <strong className="text-stone-700 dark:text-slate-200">{maleEmotion.toLowerCase().replace("_", " ")}</strong>
+                </p>
               </div>
             </div>
             <div className="mt-5 space-y-3">
@@ -115,14 +124,14 @@ export function SymmetricalPanels({ male, female }: SymmetricalPanelsProps) {
                 { label: "Avg Contest Rating", val: male.avgContestRating ? String(Math.round(male.avgContestRating)) : "Unrated", bold: true },
                 { label: "Active Coders", val: `${male.activeCodersCount} / ${male.participantCount} (${male.participantCount > 0 ? Math.round((male.activeCodersCount / male.participantCount) * 100) : 0}%)`, bold: false },
               ].map((m) => (
-                <div key={m.label} className="flex items-center justify-between pb-2 border-b border-[#21262d]">
-                  <span className="text-xs text-[#848d97]">{m.label}</span>
-                  <span className={`font-mono text-${m.bold ? "base font-bold" : "sm font-semibold"} text-[#e6edf3]`}>{m.val}</span>
+                <div key={m.label} className="flex items-center justify-between pb-2.5 border-b border-stone-100 dark:border-slate-800">
+                  <span className="text-xs font-medium text-stone-500 dark:text-slate-400">{m.label}</span>
+                  <span className={`font-mono text-${m.bold ? "base font-black text-stone-900 dark:text-white" : "sm font-bold text-stone-800 dark:text-slate-200"}`}>{m.val}</span>
                 </div>
               ))}
               <div className="flex items-center justify-between pt-1">
-                <span className="text-xs text-[#848d97]">Total Group Solves</span>
-                <span className="font-mono text-xs font-semibold text-[#6e7681]">{fmtInt(male.totalSolved)} solves</span>
+                <span className="text-xs font-medium text-stone-500 dark:text-slate-400">Total Group Solves</span>
+                <span className="font-mono text-xs font-bold text-stone-600 dark:text-slate-400">{fmtInt(male.totalSolved)} solves</span>
               </div>
             </div>
           </div>

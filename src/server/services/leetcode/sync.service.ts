@@ -12,7 +12,14 @@ export function isDataStale(lastSyncAt: Date | null): boolean {
   return lastSyncAt < cutoff;
 }
 
-export async function syncUserLeetCodeData(accountId: string): Promise<{
+export interface SyncUserLeetCodeOptions {
+  triggerAggregations?: boolean;
+}
+
+export async function syncUserLeetCodeData(
+  accountId: string,
+  options?: SyncUserLeetCodeOptions
+): Promise<{
   success: boolean;
   error?: string;
 }> {
@@ -41,71 +48,68 @@ export async function syncUserLeetCodeData(accountId: string): Promise<{
     const highestContestRating = Math.max(existingPeak, currentRating) || null;
 
     // Atomic non-destructive persistence transaction (US4)
-    await db.$transaction(async (tx) => {
-      // 1. Upsert coding statistics
-      await tx.codingStatistics.upsert({
-        where: { accountId },
-        create: {
-          accountId,
-          totalSolved: data.totalSolved,
-          easySolved: data.easySolved,
-          mediumSolved: data.mediumSolved,
-          hardSolved: data.hardSolved,
-          acceptanceRate: data.acceptanceRate,
-          contestRating: data.contestRating,
-          highestContestRating,
-          globalContestRank: data.globalContestRank,
-          contestsAttended: data.contestsAttended,
-          submissionCalendarJson: JSON.stringify(data.submissionCalendar),
-        },
-        update: {
-          totalSolved: data.totalSolved,
-          easySolved: data.easySolved,
-          mediumSolved: data.mediumSolved,
-          hardSolved: data.hardSolved,
-          acceptanceRate: data.acceptanceRate,
-          contestRating: data.contestRating,
-          highestContestRating,
-          globalContestRank: data.globalContestRank,
-          contestsAttended: data.contestsAttended,
-          submissionCalendarJson: JSON.stringify(data.submissionCalendar),
-        },
-      });
-
-      // 2. Upsert recent submissions (deduplicate)
-      for (const sub of data.recentSubmissions) {
-        await tx.submissionHistory.upsert({
-          where: {
-            accountId_titleSlug_timestamp: {
-              accountId,
-              titleSlug: sub.titleSlug,
-              timestamp: sub.timestamp,
-            },
-          },
+    await db.$transaction(
+      async (tx) => {
+        // 1. Upsert coding statistics
+        await tx.codingStatistics.upsert({
+          where: { accountId },
           create: {
             accountId,
-            title: sub.title,
-            titleSlug: sub.titleSlug,
-            timestamp: sub.timestamp,
-            status: sub.status,
-            lang: sub.lang,
+            totalSolved: data.totalSolved,
+            easySolved: data.easySolved,
+            mediumSolved: data.mediumSolved,
+            hardSolved: data.hardSolved,
+            acceptanceRate: data.acceptanceRate,
+            contestRating: data.contestRating,
+            highestContestRating,
+            globalContestRank: data.globalContestRank,
+            contestsAttended: data.contestsAttended,
+            submissionCalendarJson: JSON.stringify(data.submissionCalendar),
           },
           update: {
-            status: sub.status,
+            totalSolved: data.totalSolved,
+            easySolved: data.easySolved,
+            mediumSolved: data.mediumSolved,
+            hardSolved: data.hardSolved,
+            acceptanceRate: data.acceptanceRate,
+            contestRating: data.contestRating,
+            highestContestRating,
+            globalContestRank: data.globalContestRank,
+            contestsAttended: data.contestsAttended,
+            submissionCalendarJson: JSON.stringify(data.submissionCalendar),
           },
         });
-      }
 
-      // 3. Mark sync successful
-      await tx.linkedCodingAccount.update({
-        where: { id: accountId },
-        data: {
-          syncStatus: "SUCCESS",
-          lastSyncAt: new Date(),
-          lastSyncError: null,
-        },
-      });
-    });
+        // 2. Batch insert recent submissions in a single query (US4 deduplication)
+        if (data.recentSubmissions && data.recentSubmissions.length > 0) {
+          await tx.submissionHistory.createMany({
+            data: data.recentSubmissions.map((sub) => ({
+              accountId,
+              title: sub.title,
+              titleSlug: sub.titleSlug,
+              timestamp: sub.timestamp,
+              status: sub.status,
+              lang: sub.lang,
+            })),
+            skipDuplicates: true,
+          });
+        }
+
+        // 3. Mark sync successful
+        await tx.linkedCodingAccount.update({
+          where: { id: accountId },
+          data: {
+            syncStatus: "SUCCESS",
+            lastSyncAt: new Date(),
+            lastSyncError: null,
+          },
+        });
+      },
+      {
+        timeout: 20000,
+        maxWait: 10000,
+      }
+    );
 
     // Evaluate achievements and materialize ranks post-sync (FR-328, FR-215)
     try {
@@ -114,18 +118,20 @@ export async function syncUserLeetCodeData(accountId: string): Promise<{
       console.error('Failed to evaluate achievements post-sync:', achErr);
     }
 
-    try {
-      await recalculateAllCollegeRanks();
-    } catch (rankingErr) {
-      console.error('Failed to recalculate college ranks post-sync:', rankingErr);
-    }
+    if (options?.triggerAggregations) {
+      try {
+        await recalculateAllCollegeRanks();
+      } catch (rankingErr) {
+        console.error('Failed to recalculate college ranks post-sync:', rankingErr);
+      }
 
-    // R5 — Recompute Gender War aggregates after every individual sync (FR-416).
-    // Failure is non-fatal; previous cached values remain valid.
-    try {
-      await recomputeAllGenderWarAggregates();
-    } catch (genderWarErr) {
-      console.error('Failed to recompute Gender War aggregates post-sync:', genderWarErr);
+      // R5 — Recompute Gender War aggregates after every individual sync (FR-416).
+      // Failure is non-fatal; previous cached values remain valid.
+      try {
+        await recomputeAllGenderWarAggregates();
+      } catch (genderWarErr) {
+        console.error('Failed to recompute Gender War aggregates post-sync:', genderWarErr);
+      }
     }
 
     return { success: true };

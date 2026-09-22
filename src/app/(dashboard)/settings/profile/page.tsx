@@ -25,18 +25,11 @@ export default async function ProfileSettingsPage() {
 
   return (
     <div className="mx-auto max-w-3xl px-4 py-8 sm:px-6 space-y-8">
-      <div className="flex items-center justify-between border-b border-[#21262d] pb-4">
+      <div className="flex items-center justify-between border-b border-stone-200 dark:border-slate-800 pb-4">
         <div>
-          <h1 className="text-xl font-bold text-[#e6edf3]">Profile & Account Settings</h1>
-          <p className="text-xs text-[#848d97] mt-0.5">Manage your personal details, academic cohort, and LeetCode connection.</p>
+          <h1 className="text-xl font-bold text-stone-900 dark:text-white">Profile & Account Settings</h1>
+          <p className="text-xs text-stone-500 dark:text-slate-400 mt-0.5">Manage your personal details, academic cohort, and LeetCode connection.</p>
         </div>
-        <Link
-          href="/studio/card"
-          className="inline-flex items-center gap-1.5 rounded-md border border-[#30363d] bg-[#161b22] px-3 py-1.5 text-xs font-semibold text-[#c9d1d9] hover:bg-[#21262d] hover:text-[#e6edf3] transition-colors"
-        >
-          <span>Card Studio</span>
-          <ArrowRight className="h-3 w-3" />
-        </Link>
       </div>
 
       <div className="space-y-6">

@@ -1,28 +1,52 @@
 @import "tailwindcss";
 
+@custom-variant dark (&:where(.dark, .dark *));
+
 :root {
-  --background: #0b0f14;
-  --foreground: #ece8e1;
+  --background: #faf8f5;
+  --foreground: #1c1917;
 
-  /* Moody Atmospheric Dark Palette */
-  --canvas-default: #0b0f14;
-  --canvas-subtle: #121820;
-  --canvas-inset: #070a0e;
-  --canvas-overlay: #18202b;
-  --border-default: #2d3848;
-  --border-muted: #1e2632;
-  --border-subtle: #151c24;
+  /* Elevated Warm Neutral Palette ("Lighter and a bit warmer") */
+  --canvas-default: #faf8f5;
+  --canvas-subtle: #f2efe9;
+  --canvas-card: #ffffff;
+  --canvas-hero: #0c1222;
+  --canvas-overlay: #ffffff;
 
-  --fg-default: #ece8e1;
-  --fg-muted: #8d98a5;
-  --fg-subtle: #6b7785;
+  --border-default: #e8e4dc;
+  --border-muted: #d8d3c8;
+  --border-subtle: #f2efe9;
 
-  /* 221B Baker Street Accents */
-  --accent-gold: #c89b68;
-  --accent-teal: #22515e;
-  --accent-wine: #7c2d37;
-  --accent-fg: #c89b68;
-  --accent-purple: #9b5de5;
+  --fg-default: #1c1917;
+  --fg-muted: #57534e;
+  --fg-subtle: #78716c;
+
+  /* Vibrant Modern Accents */
+  --accent-blue: #2563eb;
+  --accent-sky: #38bdf8;
+  --accent-gold: #f59e0b;
+  --accent-emerald: #10b981;
+  --accent-rose: #ef4444;
+  --accent-indigo: #6366f1;
+}
+
+.dark {
+  --background: #090d16;
+  --foreground: #f1f5f9;
+
+  --canvas-default: #090d16;
+  --canvas-subtle: #0f172a;
+  --canvas-card: #131b2e;
+  --canvas-hero: #060911;
+  --canvas-overlay: #131b2e;
+
+  --border-default: #1e293b;
+  --border-muted: #334155;
+  --border-subtle: #1e293b;
+
+  --fg-default: #f1f5f9;
+  --fg-muted: #94a3b8;
+  --fg-subtle: #64748b;
 }
 
 @theme inline {
@@ -46,15 +70,15 @@ h1, h2, h3, .font-display {
   letter-spacing: -0.02em;
 }
 
-/* Minimalist Micro-Interactions */
+/* Modern Card Hover & Micro-Interactions */
 .card-hover {
   transition: transform 0.2s cubic-bezier(0.16, 1, 0.3, 1), border-color 0.2s ease, box-shadow 0.2s ease;
 }
 
 .card-hover:hover {
   transform: translateY(-2px);
-  border-color: #444c56;
-  box-shadow: 0 6px 20px -4px rgba(0, 0, 0, 0.6);
+  border-color: #93c5fd;
+  box-shadow: 0 10px 25px -5px rgba(15, 23, 42, 0.08), 0 8px 10px -6px rgba(15, 23, 42, 0.04);
 }
 
 .btn-press {
@@ -65,21 +89,21 @@ h1, h2, h3, .font-display {
   transform: scale(0.98);
 }
 
-/* Smooth sleek custom scrollbar */
+/* Crisp Clean Scrollbar */
 ::-webkit-scrollbar {
   width: 8px;
   height: 8px;
 }
 
 ::-webkit-scrollbar-track {
-  background: #0d1117;
+  background: #f1f5f9;
 }
 
 ::-webkit-scrollbar-thumb {
-  background: #21262d;
+  background: #cbd5e1;
   border-radius: 4px;
 }
 
 ::-webkit-scrollbar-thumb:hover {
-  background: #30363d;
+  background: #94a3b8;
 }

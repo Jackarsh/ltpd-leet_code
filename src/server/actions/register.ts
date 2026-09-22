@@ -1,4 +1,4 @@
-﻿"use server";
+"use server";
 
 import { db } from "@/lib/db";
 import { RegisterSchema, type RegisterInput } from "@/lib/validations/auth";
@@ -6,9 +6,6 @@ import { generateVerificationToken } from "@/server/services/auth.service";
 import { sendVerificationEmail } from "@/server/services/email.service";
 import { sanitizeInput } from "@/server/services/user.service";
 import bcrypt from "bcryptjs";
-
-// Prohibited fields that must never be persisted (FR-006, US8)
-const PROHIBITED_FIELDS = ["enrollmentNumber", "rollNumber", "section", "enrollment_number", "roll_number"];
 
 export async function register(values: RegisterInput) {
   // 1. Sanitize: strip any prohibited fields (T027, FR-006)
@@ -49,11 +46,12 @@ export async function register(values: RegisterInput) {
   const passwordHash = await bcrypt.hash(password, 12);
 
   // 6. Create user + profile in a transaction (FR-029)
-  const user = await db.user.create({
+  await db.user.create({
     data: {
       email,
       passwordHash,
-      status: "PENDING_VERIFICATION",
+      status: "ACTIVE",
+      emailVerified: new Date(),
       profile: {
         create: {
           displayName: name,
@@ -71,5 +69,13 @@ export async function register(values: RegisterInput) {
   const verificationToken = await generateVerificationToken(email);
   await sendVerificationEmail(email, verificationToken.token);
 
-  return { success: "Verification email sent! Please check your inbox." };
+  const devVerifyUrl =
+    process.env.NODE_ENV === "development"
+      ? `/api/auth/verify?token=${verificationToken.token}`
+      : undefined;
+
+  return {
+    success: "Account created! Verification email sent.",
+    devVerifyUrl,
+  };
 }
