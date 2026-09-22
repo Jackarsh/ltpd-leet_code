@@ -1,6 +1,6 @@
 "use client";
 
-import { useState, useTransition } from "react";
+import { useTransition } from "react";
 import { useRouter } from "next/navigation";
 import { RefreshCw } from "lucide-react";
 
@@ -11,29 +11,27 @@ interface LeaderboardRefreshButtonProps {
 export function LeaderboardRefreshButton({ lastPlatformSyncAt }: LeaderboardRefreshButtonProps) {
   const router = useRouter();
   const [isPending, startTransition] = useTransition();
-  const [lastRefreshed, setLastRefreshed] = useState<Date>(new Date());
 
   const handleRefresh = () => {
-    startTransition(() => { router.refresh(); setLastRefreshed(new Date()); });
+    startTransition(() => {
+      router.refresh();
+    });
   };
 
-  const formatTime = (date: Date) => date.toLocaleTimeString([], { hour: "2-digit", minute: "2-digit", second: "2-digit" });
   const formatPlatformSync = (iso: string | null) => {
     if (!iso) return "No platform sync yet";
     return new Date(iso).toLocaleTimeString([], { hour: "2-digit", minute: "2-digit" });
   };
 
   return (
-    <div className="flex flex-col sm:flex-row items-start sm:items-center justify-between gap-3 text-xs text-[#848d97] py-2">
-      <div className="flex items-center gap-4 flex-wrap">
-        <span>LeetCode synced: <strong className="text-[#e6edf3] font-medium">{formatPlatformSync(lastPlatformSyncAt)}</strong></span>
-        <span>Data refreshed: <strong className="text-[#e6edf3] font-medium">{formatTime(lastRefreshed)}</strong></span>
-      </div>
-      <button onClick={handleRefresh} disabled={isPending}
-        className="flex items-center gap-1.5 rounded-lg border border-[#30363d] bg-[#161b22] px-3 py-1.5 text-xs font-medium text-[#c9d1d9] hover:border-[#484f58] hover:bg-[#21262d] transition-all disabled:opacity-50">
-        <RefreshCw className={`h-3 w-3 ${isPending ? "animate-spin" : ""}`} />
-        <span>Reload Displayed Data</span>
-      </button>
-    </div>
+    <button
+      onClick={handleRefresh}
+      disabled={isPending}
+      title={lastPlatformSyncAt ? `Last platform sync: ${formatPlatformSync(lastPlatformSyncAt)}` : "Refresh displayed rankings"}
+      className="flex items-center gap-1.5 rounded-lg border border-[#25303e] bg-[#121820] px-3 py-1.5 text-xs font-medium text-[#d6d0c7] hover:border-[#c89b68]/50 hover:bg-[#18212b] hover:text-[#ece8e1] transition-all disabled:opacity-50 btn-press shrink-0 shadow-sm shadow-black/20"
+    >
+      <RefreshCw className={`h-3 w-3 ${isPending ? "animate-spin text-[#c89b68]" : "text-[#8d98a5]"}`} />
+      <span>Reload Displayed Data</span>
+    </button>
   );
 }

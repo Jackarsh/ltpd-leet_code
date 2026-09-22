@@ -5,7 +5,6 @@ import { ComparisonHeader } from "@/components/gender-war/ComparisonHeader";
 import { SymmetricalPanels } from "@/components/gender-war/SymmetricalPanels";
 import { MetricComparisonCharts } from "@/components/gender-war/MetricComparisonCharts";
 import { WithinGroupLeaderboards } from "@/components/gender-war/WithinGroupLeaderboards";
-import { MethodologyPanel } from "@/components/gender-war/MethodologyPanel";
 import type { GenderWarTimeWindow } from "@/types/gender-war";
 
 export const metadata: Metadata = {
@@ -31,7 +30,6 @@ export default async function GenderWarPage({ searchParams }: GenderWarPageProps
         <Suspense fallback={<div className="space-y-3"><div className="h-9 w-64 rounded-lg bg-[#161b22] animate-pulse" /></div>}>
           <ComparisonHeader currentWindow={timeWindow} computedAt={data.computedAt} />
         </Suspense>
-        <MethodologyPanel />
         <SymmetricalPanels male={data.male} female={data.female} />
         <MetricComparisonCharts male={data.male} female={data.female} />
         <Suspense fallback={<div className="grid grid-cols-1 gap-4 md:grid-cols-2"><div className="h-80 rounded-xl bg-[#161b22] animate-pulse" /><div className="h-80 rounded-xl bg-[#161b22] animate-pulse" /></div>}>

@@ -1,24 +1,28 @@
 @import "tailwindcss";
 
 :root {
-  --background: #0d1117;
-  --foreground: #e6edf3;
+  --background: #0b0f14;
+  --foreground: #ece8e1;
 
-  /* Dark Monochromatic Palette */
-  --canvas-default: #0d1117;
-  --canvas-subtle: #161b22;
-  --canvas-inset: #010409;
-  --canvas-overlay: #1c2128;
-  --border-default: #30363d;
-  --border-muted: #21262d;
-  --border-subtle: #1b1f24;
+  /* Moody Atmospheric Dark Palette */
+  --canvas-default: #0b0f14;
+  --canvas-subtle: #121820;
+  --canvas-inset: #070a0e;
+  --canvas-overlay: #18202b;
+  --border-default: #2d3848;
+  --border-muted: #1e2632;
+  --border-subtle: #151c24;
 
-  --fg-default: #e6edf3;
-  --fg-muted: #848d97;
-  --fg-subtle: #6e7681;
+  --fg-default: #ece8e1;
+  --fg-muted: #8d98a5;
+  --fg-subtle: #6b7785;
 
-  /* Single muted accent — used sparingly */
-  --accent-fg: #8b949e;
+  /* 221B Baker Street Accents */
+  --accent-gold: #c89b68;
+  --accent-teal: #22515e;
+  --accent-wine: #7c2d37;
+  --accent-fg: #c89b68;
+  --accent-purple: #9b5de5;
 }
 
 @theme inline {

@@ -94,11 +94,6 @@ export function SymmetricalPanels({ male, female }: SymmetricalPanelsProps) {
               </div>
             </div>
           </div>
-          {female.isLowSampleSize && (
-            <div className="mt-4 p-2 rounded-lg bg-[#21262d] border border-[#30363d] text-[11px] text-[#848d97]">
-              Small cohort (&lt; 5 coders). Normalized averages may have high variance.
-            </div>
-          )}
         </div>
 
         {/* Male Panel */}
@@ -131,11 +126,6 @@ export function SymmetricalPanels({ male, female }: SymmetricalPanelsProps) {
               </div>
             </div>
           </div>
-          {male.isLowSampleSize && (
-            <div className="mt-4 p-2 rounded-lg bg-[#21262d] border border-[#30363d] text-[11px] text-[#848d97]">
-              Small cohort (&lt; 5 coders). Normalized averages may have high variance.
-            </div>
-          )}
         </div>
       </div>
     </div>

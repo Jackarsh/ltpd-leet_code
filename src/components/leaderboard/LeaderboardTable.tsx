@@ -58,26 +58,26 @@ export function LeaderboardTable({
 
   return (
     <div className="w-full">
-      <div className="flex flex-wrap items-center justify-between gap-3 mb-4 pb-3 border-b border-[#21262d]">
+      <div className="flex flex-wrap items-center justify-between gap-3 mb-4 pb-3 border-b border-[#1e2632]">
         <div className="flex items-center gap-3">
-          <span className="text-xs text-[#848d97]">
-            Showing <strong className="text-[#e6edf3]">{data.students.length}</strong> of{" "}
-            <strong className="text-[#e6edf3]">{data.total}</strong> ranked coders
+          <span className="text-xs text-[#8d98a5]">
+            Showing <strong className="text-[#ece8e1]">{data.students.length}</strong> of{" "}
+            <strong className="text-[#ece8e1]">{data.total}</strong> ranked coders
           </span>
           <button
             onClick={() => setShowFormulaModal(true)}
-            className="text-xs text-[#848d97] hover:text-[#e6edf3] hover:underline"
+            className="text-xs text-[#8d98a5] hover:text-[#e5b882] transition-colors hover:underline"
           >
             Ranking Formula
           </button>
         </div>
 
         <div className="flex items-center gap-1.5">
-          <span className="text-xs text-[#6e7681] mr-1 hidden sm:inline">Sort by:</span>
+          <span className="text-xs text-[#6b7785] mr-1 hidden sm:inline">Sort by:</span>
           <select
             value={sortBy}
             onChange={(e) => handleSortChange(e.target.value as LeaderboardSortDimension)}
-            className="rounded-md border border-[#30363d] bg-[#161b22] px-2.5 py-1.5 text-xs font-semibold text-[#e6edf3] focus:border-[#484f58] focus:outline-none cursor-pointer"
+            className="rounded-lg border border-[#25303e] bg-[#121820] px-2.5 py-1.5 text-xs font-semibold text-[#ece8e1] focus:border-[#c89b68]/70 focus:outline-none cursor-pointer transition-colors"
           >
             {sortOptions.map((opt) => (
               <option key={opt.value} value={opt.value}>{opt.label}</option>
@@ -86,7 +86,7 @@ export function LeaderboardTable({
           <button
             onClick={toggleSortDir}
             title={sortDir === "asc" ? "Ascending" : "Descending"}
-            className="flex h-8 w-8 items-center justify-center rounded-md border border-[#30363d] bg-[#161b22] text-[#848d97] hover:text-[#e6edf3] hover:border-[#484f58] transition-colors"
+            className="flex h-8 w-8 items-center justify-center rounded-lg border border-[#25303e] bg-[#121820] text-[#8d98a5] hover:text-[#ece8e1] hover:border-[#c89b68]/50 transition-colors shadow-sm shadow-black/20"
           >
             {sortDir === "asc" ? <ArrowUp className="h-3.5 w-3.5" /> : <ArrowDown className="h-3.5 w-3.5" />}
           </button>
@@ -100,25 +100,25 @@ export function LeaderboardTable({
           ))}
         </div>
       ) : (
-        <div className="py-16 text-center rounded-xl border border-[#21262d] bg-[#161b22]/50">
-          <p className="text-sm font-medium text-[#848d97]">No coders match the selected filters</p>
-          <p className="text-xs text-[#6e7681] mt-1">Try broadening your search or resetting filters</p>
+        <div className="py-16 text-center rounded-xl border border-[#1e2632] bg-[#121820]/60 shadow-inner">
+          <p className="text-sm font-medium text-[#8d98a5]">No coders match the selected filters</p>
+          <p className="text-xs text-[#6b7785] mt-1">Try broadening your search or resetting filters</p>
         </div>
       )}
 
       {data.totalPages > 1 && (
-        <div className="flex flex-wrap items-center justify-between gap-3 mt-6 pt-4 border-t border-[#21262d]">
-          <span className="text-xs text-[#848d97]">
-            Page <strong className="text-[#e6edf3]">{data.page}</strong> of{" "}
-            <strong className="text-[#e6edf3]">{data.totalPages}</strong>
+        <div className="flex flex-wrap items-center justify-between gap-3 mt-6 pt-4 border-t border-[#1e2632]">
+          <span className="text-xs text-[#8d98a5]">
+            Page <strong className="text-[#ece8e1]">{data.page}</strong> of{" "}
+            <strong className="text-[#ece8e1]">{data.totalPages}</strong>
           </span>
           <div className="flex items-center gap-1.5">
             <button onClick={() => handlePageChange(data.page - 1)} disabled={data.page <= 1}
-              className="flex items-center gap-1 rounded-md border border-[#30363d] bg-[#161b22] px-3 py-1.5 text-xs font-medium text-[#c9d1d9] hover:bg-[#21262d] disabled:opacity-40 disabled:cursor-not-allowed transition-colors">
+              className="flex items-center gap-1 rounded-lg border border-[#25303e] bg-[#121820] px-3 py-1.5 text-xs font-medium text-[#d6d0c7] hover:bg-[#18212b] hover:border-[#c89b68]/40 disabled:opacity-40 disabled:cursor-not-allowed transition-colors">
               <ChevronLeft className="h-3.5 w-3.5" /><span>Previous</span>
             </button>
             <button onClick={() => handlePageChange(data.page + 1)} disabled={data.page >= data.totalPages}
-              className="flex items-center gap-1 rounded-md border border-[#30363d] bg-[#161b22] px-3 py-1.5 text-xs font-medium text-[#c9d1d9] hover:bg-[#21262d] disabled:opacity-40 disabled:cursor-not-allowed transition-colors">
+              className="flex items-center gap-1 rounded-lg border border-[#25303e] bg-[#121820] px-3 py-1.5 text-xs font-medium text-[#d6d0c7] hover:bg-[#18212b] hover:border-[#c89b68]/40 disabled:opacity-40 disabled:cursor-not-allowed transition-colors">
               <span>Next</span><ChevronRight className="h-3.5 w-3.5" />
             </button>
           </div>

@@ -64,9 +64,6 @@ function ComparisonBar({
       <div className="flex items-center justify-between gap-2">
         <span className="text-xs font-medium text-zinc-400">
           {label}
-          {isNormalized && (
-            <span className="ml-1 text-[10px] text-indigo-400">/student</span>
-          )}
         </span>
         {!tied && (
           <span
@@ -220,7 +217,6 @@ export function MetricComparisonCharts({ male, female }: MetricComparisonChartsP
             <span className="inline-block h-2 w-2 rounded-full bg-rose-500" />
             Female
           </span>
-          <span className="text-indigo-400">/student = normalized</span>
         </div>
       </div>
 
@@ -229,13 +225,6 @@ export function MetricComparisonCharts({ male, female }: MetricComparisonChartsP
           <ComparisonBar key={chart.label} {...chart} />
         ))}
       </div>
-
-      {/* FR-427: footnote distinguishing raw vs normalised */}
-      <p className="mt-2 text-[11px] text-zinc-600">
-        Bars use per-student normalised values where marked{" "}
-        <span className="text-indigo-400">/student</span> — raw totals are shown in the{" "}
-        Group Metrics panels above. Bars always share the same scale for both groups (FR-426).
-      </p>
     </section>
   );
 }
