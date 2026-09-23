@@ -27,7 +27,7 @@ export const { handlers, signIn, signOut, auth } = NextAuth({
           token.name = profile.displayName;
           token.gender = profile.gender;
           token.leetcodeUsername = profile.leetcodeUsername;
-          token.needsOnboarding = profile.branch === null;
+          token.needsOnboarding = profile.branch === null || !profile.leetcodeUsername || profile.leetcodeUsername.trim() === "";
         }
         // Fetch role
         const dbUser = await db.user.findUnique({
@@ -148,7 +148,7 @@ export const { handlers, signIn, signOut, auth } = NextAuth({
                 create: {
                   displayName: name,
                   gender: "MALE",
-                  leetcodeUsername: handle,
+                  leetcodeUsername: "", // Leave empty to force onboarding
                 },
               },
             },
