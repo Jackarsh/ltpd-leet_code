@@ -1,4 +1,4 @@
-﻿"use client";
+"use client";
 
 import React from "react";
 
@@ -19,19 +19,19 @@ export function GenderSelect({ value, onChange, error, disabled }: GenderSelectP
   ];
 
   return (
-    <fieldset className="space-y-2" disabled={disabled}>
-      <legend className="text-sm font-medium text-zinc-300">
-        Gender <span className="text-rose-400">*</span>
+    <fieldset className="space-y-1.5" disabled={disabled}>
+      <legend className="text-xs font-semibold text-slate-700 dark:text-[#848d97]">
+        Gender <span className="text-rose-500 dark:text-[#f85149]">*</span>
       </legend>
       <div className="flex gap-4">
         {options.map((option) => (
           <label
             key={option.value}
             className={[
-              "flex items-center gap-2 cursor-pointer rounded-lg border px-4 py-2.5 transition-all",
+              "flex items-center gap-2.5 cursor-pointer rounded-lg border px-4 py-2 text-xs font-medium transition-all",
               value === option.value
-                ? "border-indigo-500 bg-indigo-500/10 text-indigo-300"
-                : "border-zinc-700 bg-zinc-800/50 text-zinc-400 hover:border-zinc-500",
+                ? "border-blue-500 bg-blue-50 text-blue-700 dark:border-indigo-500 dark:bg-indigo-500/10 dark:text-indigo-300 shadow-sm"
+                : "border-slate-200 bg-white hover:bg-slate-50 hover:border-slate-300 text-slate-700 dark:border-[#30363d] dark:bg-[#0d1117] dark:text-[#848d97] dark:hover:border-[#484f58]",
               disabled ? "opacity-50 cursor-not-allowed" : "",
             ].join(" ")}
           >
@@ -47,19 +47,21 @@ export function GenderSelect({ value, onChange, error, disabled }: GenderSelectP
             <div
               className={[
                 "h-4 w-4 rounded-full border-2 flex items-center justify-center transition-all",
-                value === option.value ? "border-indigo-500" : "border-zinc-600",
+                value === option.value
+                  ? "border-blue-600 dark:border-indigo-500"
+                  : "border-slate-300 dark:border-[#484f58]",
               ].join(" ")}
             >
               {value === option.value && (
-                <div className="h-2 w-2 rounded-full bg-indigo-500" />
+                <div className="h-2 w-2 rounded-full bg-blue-600 dark:bg-indigo-500" />
               )}
             </div>
-            <span className="text-sm font-medium">{option.label}</span>
+            <span className="font-semibold">{option.label}</span>
           </label>
         ))}
       </div>
       {error && (
-        <p className="text-sm text-rose-400 mt-1">{error}</p>
+        <p className="text-xs text-rose-500 dark:text-[#f85149] mt-1">{error}</p>
       )}
     </fieldset>
   );

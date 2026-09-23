@@ -180,9 +180,9 @@ export function ProfileSettingsForm({ initialData }: ProfileSettingsFormProps) {
           <button
             type="submit"
             disabled={isPending}
-            className="btn-press rounded-md bg-slate-100 dark:bg-[#21262d] border border-slate-200 dark:border-[#30363d] px-4 py-2 text-xs font-semibold text-slate-800 dark:text-[#e6edf3] hover:bg-slate-200 dark:hover:bg-[#30363d] transition-all disabled:opacity-50 flex items-center gap-2"
+            className="btn-press rounded-md bg-blue-600 hover:bg-blue-500 text-white px-4 py-2 text-xs font-semibold transition-all disabled:opacity-50 flex items-center gap-2 shadow-sm"
           >
-            {isPending ? <Loader2 className="h-3.5 w-3.5 animate-spin" /> : <Save className="h-3.5 w-3.5 text-slate-500 dark:text-[#848d97]" />}
+            {isPending ? <Loader2 className="h-3.5 w-3.5 animate-spin" /> : <Save className="h-3.5 w-3.5 text-blue-100" />}
             <span>{isPending ? "Saving..." : "Save Profile"}</span>
           </button>
         </form>
@@ -226,7 +226,7 @@ export function ProfileSettingsForm({ initialData }: ProfileSettingsFormProps) {
           <button
             type="submit"
             disabled={isEmailPending || !newEmail.trim()}
-            className="btn-press rounded-md bg-slate-100 dark:bg-[#21262d] border border-slate-200 dark:border-[#30363d] px-4 py-2 text-xs font-semibold text-slate-800 dark:text-[#e6edf3] hover:bg-slate-200 dark:hover:bg-[#30363d] transition-all disabled:opacity-50 flex items-center gap-2"
+            className="btn-press rounded-md bg-blue-600 hover:bg-blue-500 text-white px-4 py-2 text-xs font-semibold transition-all disabled:opacity-50 flex items-center gap-2 shadow-sm"
           >
             {isEmailPending && <Loader2 className="h-3.5 w-3.5 animate-spin" />}
             <span>{isEmailPending ? "Sending Verification..." : "Update Email"}</span>

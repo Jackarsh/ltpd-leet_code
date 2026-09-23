@@ -204,10 +204,10 @@ export function RegisterForm() {
         </div>
       )}
 
-      {/* Full Name (FR-002) */}
+      {/* Full Name (FR-001) */}
       <div className="space-y-1.5">
-        <label htmlFor="name" className="text-sm font-medium text-zinc-300">
-          Full Name <span className="text-rose-400">*</span>
+        <label htmlFor="name" className="text-sm font-medium text-stone-700 dark:text-zinc-300">
+          Full Name <span className="text-rose-500 dark:text-rose-400">*</span>
         </label>
         <input
           id="name"
@@ -216,15 +216,15 @@ export function RegisterForm() {
           required
           disabled={isPending}
           placeholder="Enter your full name"
-          className="w-full rounded-lg border border-zinc-700 bg-zinc-800/50 px-4 py-2.5 text-zinc-100 placeholder:text-zinc-500 focus:border-indigo-500 focus:outline-none focus:ring-1 focus:ring-indigo-500 transition-all disabled:opacity-50"
+          className="w-full rounded-lg border border-stone-300/80 dark:border-zinc-700 bg-stone-50/60 dark:bg-zinc-800/50 px-4 py-2.5 text-stone-900 dark:text-zinc-100 placeholder:text-stone-400 dark:placeholder:text-zinc-500 focus:bg-white dark:focus:bg-zinc-800 focus:border-indigo-500 focus:outline-none focus:ring-1 focus:ring-indigo-500 transition-all disabled:opacity-50"
         />
-        {errors.name && <p className="text-sm text-rose-400">{errors.name[0]}</p>}
+        {errors.name && <p className="text-sm text-rose-500 dark:text-rose-400">{errors.name[0]}</p>}
       </div>
 
       {/* Email (FR-001, FR-002) */}
       <div className="space-y-1.5">
-        <label htmlFor="email" className="text-sm font-medium text-zinc-300">
-          Email <span className="text-rose-400">*</span>
+        <label htmlFor="email" className="text-sm font-medium text-stone-700 dark:text-zinc-300">
+          Email <span className="text-rose-500 dark:text-rose-400">*</span>
         </label>
         <input
           id="email"
@@ -233,15 +233,15 @@ export function RegisterForm() {
           required
           disabled={isPending}
           placeholder="you@example.com"
-          className="w-full rounded-lg border border-zinc-700 bg-zinc-800/50 px-4 py-2.5 text-zinc-100 placeholder:text-zinc-500 focus:border-indigo-500 focus:outline-none focus:ring-1 focus:ring-indigo-500 transition-all disabled:opacity-50"
+          className="w-full rounded-lg border border-stone-300/80 dark:border-zinc-700 bg-stone-50/60 dark:bg-zinc-800/50 px-4 py-2.5 text-stone-900 dark:text-zinc-100 placeholder:text-stone-400 dark:placeholder:text-zinc-500 focus:bg-white dark:focus:bg-zinc-800 focus:border-indigo-500 focus:outline-none focus:ring-1 focus:ring-indigo-500 transition-all disabled:opacity-50"
         />
-        {errors.email && <p className="text-sm text-rose-400">{errors.email[0]}</p>}
+        {errors.email && <p className="text-sm text-rose-500 dark:text-rose-400">{errors.email[0]}</p>}
       </div>
 
       {/* Password (FR-031) */}
       <div className="space-y-1.5">
-        <label htmlFor="password" className="text-sm font-medium text-zinc-300">
-          Password <span className="text-rose-400">*</span>
+        <label htmlFor="password" className="text-sm font-medium text-stone-700 dark:text-zinc-300">
+          Password <span className="text-rose-500 dark:text-rose-400">*</span>
         </label>
         <input
           id="password"
@@ -251,15 +251,15 @@ export function RegisterForm() {
           minLength={6}
           disabled={isPending}
           placeholder="Minimum 6 characters"
-          className="w-full rounded-lg border border-zinc-700 bg-zinc-800/50 px-4 py-2.5 text-zinc-100 placeholder:text-zinc-500 focus:border-indigo-500 focus:outline-none focus:ring-1 focus:ring-indigo-500 transition-all disabled:opacity-50"
+          className="w-full rounded-lg border border-stone-300/80 dark:border-zinc-700 bg-stone-50/60 dark:bg-zinc-800/50 px-4 py-2.5 text-stone-900 dark:text-zinc-100 placeholder:text-stone-400 dark:placeholder:text-zinc-500 focus:bg-white dark:focus:bg-zinc-800 focus:border-indigo-500 focus:outline-none focus:ring-1 focus:ring-indigo-500 transition-all disabled:opacity-50"
         />
-        {errors.password && <p className="text-sm text-rose-400">{errors.password[0]}</p>}
+        {errors.password && <p className="text-sm text-rose-500 dark:text-rose-400">{errors.password[0]}</p>}
       </div>
 
       {/* LeetCode Username (FR-002) */}
       <div className="space-y-1.5">
-        <label htmlFor="leetcodeUsername" className="text-sm font-medium text-zinc-300">
-          LeetCode Username <span className="text-rose-400">*</span>
+        <label htmlFor="leetcodeUsername" className="text-sm font-medium text-stone-700 dark:text-zinc-300">
+          LeetCode Username <span className="text-rose-500 dark:text-rose-400">*</span>
         </label>
         <input
           id="leetcodeUsername"
@@ -268,9 +268,9 @@ export function RegisterForm() {
           required
           disabled={isPending}
           placeholder="Your LeetCode handle"
-          className="w-full rounded-lg border border-zinc-700 bg-zinc-800/50 px-4 py-2.5 text-zinc-100 placeholder:text-zinc-500 focus:border-indigo-500 focus:outline-none focus:ring-1 focus:ring-indigo-500 transition-all disabled:opacity-50"
+          className="w-full rounded-lg border border-stone-300/80 dark:border-zinc-700 bg-stone-50/60 dark:bg-zinc-800/50 px-4 py-2.5 text-stone-900 dark:text-zinc-100 placeholder:text-stone-400 dark:placeholder:text-zinc-500 focus:bg-white dark:focus:bg-zinc-800 focus:border-indigo-500 focus:outline-none focus:ring-1 focus:ring-indigo-500 transition-all disabled:opacity-50"
         />
-        {errors.leetcodeUsername && <p className="text-sm text-rose-400">{errors.leetcodeUsername[0]}</p>}
+        {errors.leetcodeUsername && <p className="text-sm text-rose-500 dark:text-rose-400">{errors.leetcodeUsername[0]}</p>}
       </div>
 
       {/* Gender (FR-003, US6) */}
@@ -283,7 +283,7 @@ export function RegisterForm() {
 
       {/* Optional Academic Fields (FR-007) */}
       <details className="group">
-        <summary className="text-sm font-medium text-zinc-400 cursor-pointer hover:text-zinc-300 transition-colors">
+        <summary className="text-sm font-medium text-stone-600 dark:text-zinc-400 cursor-pointer hover:text-stone-900 dark:hover:text-zinc-300 transition-colors">
           Academic Information (Optional)
         </summary>
         <div className="mt-3 space-y-4 pl-1">
@@ -293,21 +293,18 @@ export function RegisterForm() {
               value={admissionYear}
               onChange={setAdmissionYear}
               disabled={isPending}
-              variant="dark"
             />
             <BatchSelect
               mode="graduation"
               value={graduationYear}
               onChange={setGraduationYear}
               disabled={isPending}
-              variant="dark"
             />
           </div>
           <BranchSelect
             value={branch}
             onChange={setBranch}
             disabled={isPending}
-            variant="dark"
           />
         </div>
       </details>
