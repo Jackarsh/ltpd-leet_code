@@ -4,7 +4,7 @@ import { useState } from "react";
 import Link from "next/link";
 import { usePathname } from "next/navigation";
 import { useSession, signOut } from "next-auth/react";
-import { Settings, LogOut } from "lucide-react";
+import { Settings, LogOut, Menu, X } from "lucide-react";
 import { AuthModal } from "@/components/auth/AuthModal";
 import { ThemeToggle } from "@/components/theme/ThemeToggle";
 
@@ -16,6 +16,7 @@ export function Navbar() {
 
   const [authModalOpen, setAuthModalOpen] = useState(false);
   const [authMode, setAuthMode] = useState<"login" | "register">("login");
+  const [mobileMenuOpen, setMobileMenuOpen] = useState(false);
 
   const openAuth = (mode: "login" | "register") => {
     setAuthMode(mode);
@@ -35,9 +36,9 @@ export function Navbar() {
       >
         <div className="mx-auto flex h-16 max-w-7xl items-center justify-between px-4 sm:px-6 lg:px-8">
           {/* Brand */}
-          <div className="flex items-center gap-8">
-            <Link href="/" className="flex items-center gap-2.5 group">
-              <span className="flex h-9 w-9 items-center justify-center rounded-xl bg-white/15 border border-white/25 text-white font-display font-extrabold text-lg shadow-sm backdrop-blur-sm group-hover:bg-white/20 transition-all">
+          <div className="flex items-center gap-3 sm:gap-8">
+            <Link href="/" className="flex items-center gap-2.5 group shrink-0">
+              <span className="flex h-9 w-9 items-center justify-center rounded-xl bg-white/15 border border-white/25 text-white font-display font-extrabold text-lg shadow-sm backdrop-blur-sm group-hover:bg-white/20 transition-all shrink-0">
                 CR
               </span>
               <span className="font-display text-lg font-black tracking-tight text-white drop-shadow-sm">
@@ -45,7 +46,8 @@ export function Navbar() {
               </span>
             </Link>
 
-            <div className="hidden md:flex items-center gap-1.5">
+            {/* Desktop Navigation Links */}
+            <div className="hidden sm:flex items-center gap-1.5">
               {navLinks.map((link) => {
                 const isActive =
                   link.href === "/"
@@ -69,10 +71,11 @@ export function Navbar() {
             </div>
           </div>
 
-          {/* Auth */}
-          <div className="flex items-center gap-3">
+          {/* Right Actions */}
+          <div className="flex items-center gap-2 sm:gap-3">
+            {/* Desktop Auth/Actions */}
             {isLoggedIn ? (
-              <div className="flex items-center gap-2.5">
+              <div className="hidden sm:flex items-center gap-2.5">
                 <Link
                   href="/dashboard"
                   className={`px-3.5 py-1.5 rounded-full text-xs font-semibold transition-all ${
@@ -87,7 +90,7 @@ export function Navbar() {
                 {user?.leetcodeUsername && (
                   <Link
                     href={`/profile/${user.leetcodeUsername}`}
-                    className="hidden sm:flex items-center px-3 py-1 rounded-full border border-white/25 bg-white/10 text-xs font-semibold text-white hover:bg-white/20 transition-all"
+                    className="flex items-center px-3 py-1 rounded-full border border-white/25 bg-white/10 text-xs font-semibold text-white hover:bg-white/20 transition-all"
                   >
                     @{user.leetcodeUsername}
                   </Link>
@@ -112,7 +115,7 @@ export function Navbar() {
                 </button>
               </div>
             ) : (
-              <div className="flex items-center gap-2.5">
+              <div className="hidden sm:flex items-center gap-2.5">
                 <button
                   type="button"
                   onClick={() => openAuth("register")}
@@ -123,8 +126,80 @@ export function Navbar() {
                 <ThemeToggle />
               </div>
             )}
+
+            {/* Mobile Actions */}
+            <div className="flex sm:hidden items-center gap-1.5">
+              <ThemeToggle />
+              <button
+                onClick={() => setMobileMenuOpen(!mobileMenuOpen)}
+                className="p-2 rounded-lg text-blue-100 hover:text-white hover:bg-white/15 transition-colors"
+                aria-label="Toggle mobile menu"
+              >
+                {mobileMenuOpen ? <X className="h-5 w-5" /> : <Menu className="h-5 w-5" />}
+              </button>
+            </div>
           </div>
         </div>
+
+        {/* Mobile Dropdown Menu */}
+        {mobileMenuOpen && (
+          <div className="sm:hidden border-t border-white/10 bg-[#0c2461]/95 backdrop-blur-md shadow-lg">
+            <div className="px-4 pt-2 pb-4 space-y-1">
+              {navLinks.map((link) => {
+                const isActive =
+                  link.href === "/"
+                    ? pathname === "/" || pathname === "/leaderboard"
+                    : pathname.startsWith(link.href);
+                return (
+                  <Link
+                    key={link.href}
+                    href={link.href}
+                    onClick={() => setMobileMenuOpen(false)}
+                    className={`block px-3 py-2 rounded-lg text-sm font-semibold transition-colors ${
+                      isActive ? "bg-white/10 text-white" : "text-blue-100 hover:bg-white/5 hover:text-white"
+                    }`}
+                  >
+                    {link.name}
+                  </Link>
+                );
+              })}
+              
+              <div className="my-2 border-t border-white/10" />
+
+              {isLoggedIn ? (
+                <>
+                  <Link
+                    href="/dashboard"
+                    onClick={() => setMobileMenuOpen(false)}
+                    className="block px-3 py-2 rounded-lg text-sm font-semibold text-blue-100 hover:bg-white/5 hover:text-white transition-colors"
+                  >
+                    Dashboard
+                  </Link>
+                  <Link
+                    href="/settings/profile"
+                    onClick={() => setMobileMenuOpen(false)}
+                    className="block px-3 py-2 rounded-lg text-sm font-semibold text-blue-100 hover:bg-white/5 hover:text-white transition-colors"
+                  >
+                    Settings
+                  </Link>
+                  <button
+                    onClick={() => { setMobileMenuOpen(false); signOut({ callbackUrl: "/" }); }}
+                    className="w-full text-left block px-3 py-2 rounded-lg text-sm font-semibold text-rose-300 hover:bg-white/5 hover:text-rose-200 transition-colors"
+                  >
+                    Sign Out
+                  </button>
+                </>
+              ) : (
+                <button
+                  onClick={() => { setMobileMenuOpen(false); openAuth("register"); }}
+                  className="w-full text-left block px-3 py-2 rounded-lg text-sm font-semibold text-blue-100 hover:bg-white/5 hover:text-white transition-colors"
+                >
+                  Join Platform
+                </button>
+              )}
+            </div>
+          </div>
+        )}
       </nav>
 
       <AuthModal

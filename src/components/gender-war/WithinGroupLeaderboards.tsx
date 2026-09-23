@@ -279,9 +279,8 @@ export function WithinGroupLeaderboards({
           id="within-group-leaderboards-heading"
           className="text-lg font-black text-stone-900 dark:text-white"
         >
-          Within-Group Leaderboards
+          Leaderboard
         </h2>
-        <TieBreakingLegend />
       </div>
 
       <div className="grid grid-cols-1 gap-6 md:grid-cols-2">

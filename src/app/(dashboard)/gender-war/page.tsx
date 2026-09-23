@@ -38,15 +38,9 @@ export default async function GenderWarPage({ searchParams }: GenderWarPageProps
     <div className="min-h-screen bg-[#faf8f5] dark:bg-[#090d16] text-[#1c1917] dark:text-[#f1f5f9] py-8 px-4 sm:px-6 lg:px-8 max-w-7xl mx-auto transition-colors duration-200">
       {/* Page Title & Header */}
       <div className="mb-6">
-        <div className="inline-flex items-center gap-2 px-3 py-1 rounded-full border border-stone-200 dark:border-slate-800 bg-white dark:bg-slate-900 text-stone-700 dark:text-stone-300 text-xs font-bold mb-3 shadow-sm">
-          <span>COHORT BATTLEGROUND</span>
-        </div>
         <h1 className="font-display text-3xl sm:text-4xl font-black uppercase tracking-tight text-stone-900 dark:text-white">
           Gender War Arena
         </h1>
-        <p className="mt-1.5 text-sm text-stone-600 dark:text-slate-400 max-w-2xl font-medium">
-          Transparent, sample-size normalized performance analysis comparing male and female engineering cohorts across LeetCode solve counts and contest ratings.
-        </p>
       </div>
 
       <div className="space-y-8">
@@ -61,8 +55,6 @@ export default async function GenderWarPage({ searchParams }: GenderWarPageProps
         </Suspense>
 
         <SymmetricalPanels male={data.male} female={data.female} />
-
-        <MetricComparisonCharts male={data.male} female={data.female} />
 
         <Suspense
           fallback={
@@ -79,6 +71,8 @@ export default async function GenderWarPage({ searchParams }: GenderWarPageProps
             femaleParticipantCount={data.female.participantCount}
           />
         </Suspense>
+
+        <MetricComparisonCharts male={data.male} female={data.female} />
       </div>
     </div>
   );

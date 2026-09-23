@@ -22,7 +22,7 @@ interface ComparisonBarProps {
   unit?: string;
 }
 
-function ComparisonBar({
+function MetricRow({
   label,
   maleValue,
   femaleValue,
@@ -30,72 +30,19 @@ function ComparisonBar({
   femaleLabel,
   unit = "",
 }: ComparisonBarProps) {
-  const max = Math.max(maleValue, femaleValue, 1);
-  const maleWidth = (maleValue / max) * 100;
-  const femaleWidth = (femaleValue / max) * 100;
-
   const maleLeads = maleValue > femaleValue;
   const femaleLeads = femaleValue > maleValue;
-  const tied = Math.abs(maleValue - femaleValue) < 0.01;
 
   return (
-    <div className="space-y-2 pb-3 border-b border-stone-100 dark:border-slate-800 last:border-b-0 last:pb-0">
-      {/* Metric label */}
-      <div className="flex items-center justify-between gap-2">
-        <span className="text-xs font-bold text-stone-800 dark:text-stone-200">
-          {label}
-        </span>
-        {!tied && (
-          <span
-            className={`text-[10px] font-black uppercase tracking-wider px-2 py-0.5 rounded-full border ${
-              maleLeads
-                ? "border-blue-200 dark:border-blue-800 bg-blue-50 dark:bg-blue-950/40 text-blue-700 dark:text-blue-300"
-                : "border-pink-200 dark:border-pink-800 bg-pink-50 dark:bg-pink-950/40 text-pink-700 dark:text-pink-300"
-            }`}
-          >
-            {maleLeads ? "Male leads" : "Female leads"}
-          </span>
-        )}
+    <div className="grid grid-cols-4 items-center py-3 border-b border-stone-100 dark:border-slate-800 last:border-0 last:pb-0 gap-2 sm:gap-4">
+      <div className="col-span-2 text-xs font-bold text-stone-800 dark:text-stone-200 pr-2">
+        {label}
       </div>
-
-      {/* Male bar */}
-      <div className="flex items-center gap-2.5">
-        <span className="w-12 text-right text-[11px] font-bold text-blue-700 dark:text-blue-400 shrink-0">
-          Male
-        </span>
-        <div className="flex-1 rounded-full bg-stone-100 dark:bg-slate-800 h-3 overflow-hidden p-0.5">
-          <div
-            className={`h-full rounded-full transition-all duration-500 ${
-              maleLeads ? "bg-blue-600" : "bg-blue-400"
-            }`}
-            style={{ width: `${maleWidth}%` }}
-            role="presentation"
-          />
-        </div>
-        <span className="w-16 sm:w-20 text-[11px] font-mono font-bold text-stone-900 dark:text-stone-100 shrink-0">
-          {maleLabel}
-          {unit && <span className="text-stone-500 dark:text-slate-400 font-normal"> {unit}</span>}
-        </span>
+      <div className={`col-span-1 text-right font-mono text-sm ${maleLeads ? "font-black text-blue-700 dark:text-blue-400" : "font-medium text-stone-600 dark:text-stone-400"}`}>
+        {maleLabel}{unit && <span className="text-xs font-normal opacity-70 ml-1">{unit}</span>}
       </div>
-
-      {/* Female bar */}
-      <div className="flex items-center gap-2.5">
-        <span className="w-12 text-right text-[11px] font-bold text-pink-700 dark:text-pink-400 shrink-0">
-          Female
-        </span>
-        <div className="flex-1 rounded-full bg-stone-100 dark:bg-slate-800 h-3 overflow-hidden p-0.5">
-          <div
-            className={`h-full rounded-full transition-all duration-500 ${
-              femaleLeads ? "bg-pink-600" : "bg-pink-400"
-            }`}
-            style={{ width: `${femaleWidth}%` }}
-            role="presentation"
-          />
-        </div>
-        <span className="w-16 sm:w-20 text-[11px] font-mono font-bold text-stone-900 dark:text-stone-100 shrink-0">
-          {femaleLabel}
-          {unit && <span className="text-stone-500 dark:text-slate-400 font-normal"> {unit}</span>}
-        </span>
+      <div className={`col-span-1 text-right font-mono text-sm ${femaleLeads ? "font-black text-pink-700 dark:text-pink-400" : "font-medium text-stone-600 dark:text-stone-400"}`}>
+        {femaleLabel}{unit && <span className="text-xs font-normal opacity-70 ml-1">{unit}</span>}
       </div>
     </div>
   );
@@ -104,7 +51,7 @@ function ComparisonBar({
 export function MetricComparisonCharts({ male, female }: MetricComparisonChartsProps) {
   const charts: ComparisonBarProps[] = [
     {
-      label: "Problems Solved (Avg per Student)",
+      label: "Problems Solved",
       maleValue: male.avgSolvedPerStudent,
       femaleValue: female.avgSolvedPerStudent,
       maleLabel: fmt(male.avgSolvedPerStudent),
@@ -112,7 +59,7 @@ export function MetricComparisonCharts({ male, female }: MetricComparisonChartsP
       isNormalized: true,
     },
     {
-      label: "Hard Problems Solved (Avg per Student)",
+      label: "Hard Problems Solved",
       maleValue: male.avgHardPerStudent,
       femaleValue: female.avgHardPerStudent,
       maleLabel: fmt(male.avgHardPerStudent),
@@ -120,7 +67,7 @@ export function MetricComparisonCharts({ male, female }: MetricComparisonChartsP
       isNormalized: true,
     },
     {
-      label: "Contest Rating (Cohort Avg)",
+      label: "Contest Rating",
       maleValue: male.avgContestRating ?? 0,
       femaleValue: female.avgContestRating ?? 0,
       maleLabel: male.avgContestRating !== null ? Math.round(male.avgContestRating).toString() : "—",
@@ -136,7 +83,7 @@ export function MetricComparisonCharts({ male, female }: MetricComparisonChartsP
       isNormalized: false,
     },
     {
-      label: "Current Streak (Days Avg)",
+      label: "Current Streak",
       maleValue: male.avgStreakDays,
       femaleValue: female.avgStreakDays,
       maleLabel: fmt(male.avgStreakDays),
@@ -145,7 +92,7 @@ export function MetricComparisonCharts({ male, female }: MetricComparisonChartsP
       unit: "days",
     },
     {
-      label: "Contests Attended (Avg per Student)",
+      label: "Contests Attended",
       maleValue: male.avgContestsPerStudent,
       femaleValue: female.avgContestsPerStudent,
       maleLabel: fmt(male.avgContestsPerStudent),
@@ -160,6 +107,14 @@ export function MetricComparisonCharts({ male, female }: MetricComparisonChartsP
       femaleLabel: female.recentSubmissionsCount.toLocaleString(),
       isNormalized: false,
     },
+    {
+      label: "Total Group Solves",
+      maleValue: male.totalSolved,
+      femaleValue: female.totalSolved,
+      maleLabel: male.totalSolved.toLocaleString(),
+      femaleLabel: female.totalSolved.toLocaleString(),
+      isNormalized: false,
+    },
   ];
 
   return (
@@ -169,23 +124,24 @@ export function MetricComparisonCharts({ male, female }: MetricComparisonChartsP
           id="comparison-charts-heading"
           className="text-lg font-black text-stone-900 dark:text-white"
         >
-          Normalized Metric Comparison
+          Stats
         </h2>
-        <div className="flex flex-wrap items-center gap-3 text-xs font-bold">
-          <span className="flex items-center gap-1.5 text-blue-700 dark:text-blue-400">
-            <span className="inline-block h-2.5 w-2.5 rounded-full bg-blue-600" />
-            Male Cohort
-          </span>
-          <span className="flex items-center gap-1.5 text-pink-700 dark:text-pink-400">
-            <span className="inline-block h-2.5 w-2.5 rounded-full bg-pink-600" />
-            Female Cohort
-          </span>
-        </div>
       </div>
 
-      <div className="rounded-2xl border border-stone-200/90 dark:border-slate-800 bg-white dark:bg-slate-900 px-5 py-5 sm:px-6 sm:py-6 space-y-4 shadow-sm transition-colors">
+      <div className="rounded-2xl border border-stone-200/90 dark:border-slate-800 bg-white dark:bg-slate-900 px-4 py-4 sm:px-6 shadow-sm transition-colors">
+        <div className="grid grid-cols-4 items-center pb-3 border-b-2 border-stone-100 dark:border-slate-800 gap-2 sm:gap-4">
+          <div className="col-span-2 text-[10px] font-black uppercase tracking-wider text-stone-500 dark:text-slate-400">
+            Metric
+          </div>
+          <div className="col-span-1 text-right text-[10px] font-black uppercase tracking-wider text-blue-600 dark:text-blue-400">
+            Male
+          </div>
+          <div className="col-span-1 text-right text-[10px] font-black uppercase tracking-wider text-pink-600 dark:text-pink-400">
+            Female
+          </div>
+        </div>
         {charts.map((chart) => (
-          <ComparisonBar key={chart.label} {...chart} />
+          <MetricRow key={chart.label} {...chart} />
         ))}
       </div>
     </section>

@@ -31,9 +31,14 @@ export default auth((req) => {
   const isPublicPrefix = publicPrefixes.some((prefix) => pathname.startsWith(prefix));
   const isApiRoute = pathname.startsWith("/api/");
 
+  const needsOnboarding = (req.auth?.user as { needsOnboarding?: boolean })?.needsOnboarding;
+
   if (isPublicRoute || isPublicPrefix) {
     // Redirect logged-in users away from auth pages
-    if (isLoggedIn && pathname.startsWith("/auth/")) {
+    if (isLoggedIn && pathname.startsWith("/auth/") && pathname !== "/auth/onboarding") {
+      if (needsOnboarding) {
+        return NextResponse.redirect(new URL("/auth/onboarding", nextUrl));
+      }
       return NextResponse.redirect(new URL("/dashboard", nextUrl));
     }
     return NextResponse.next();
@@ -50,6 +55,16 @@ export default auth((req) => {
     return NextResponse.redirect(
       new URL("/auth/login?callbackUrl=" + callbackUrl, nextUrl)
     );
+  }
+
+  // Enforce onboarding for incomplete social accounts
+  if (needsOnboarding && pathname !== "/auth/onboarding") {
+    return NextResponse.redirect(new URL("/auth/onboarding", nextUrl));
+  }
+
+  // Prevent accessing onboarding if not needed
+  if (!needsOnboarding && pathname === "/auth/onboarding") {
+    return NextResponse.redirect(new URL("/dashboard", nextUrl));
   }
 
   return NextResponse.next();

@@ -76,13 +76,7 @@ export default async function HomePage({ searchParams }: HomePageProps) {
             <LeaderboardRefreshButton lastPlatformSyncAt={leaderboardData.lastPlatformSyncAt} />
           </div>
 
-          <div className="flex flex-col lg:flex-row gap-8 items-start">
-            <aside className="w-full lg:w-72 xl:w-80 shrink-0 lg:sticky lg:top-20">
-              <Suspense fallback={<div className="h-96 rounded-2xl bg-white dark:bg-slate-900 border border-slate-200 dark:border-slate-800 animate-pulse" />}>
-                <LeaderboardFilters currentFilters={filterParams} />
-              </Suspense>
-            </aside>
-
+          <div className="flex flex-col gap-8 items-start">
             <section className="flex-1 min-w-0 w-full">
               <Suspense fallback={<div className="h-96 rounded-2xl bg-white dark:bg-slate-900 border border-slate-200 dark:border-slate-800 animate-pulse" />}>
                 <LeaderboardTable

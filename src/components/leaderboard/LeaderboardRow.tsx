@@ -121,7 +121,7 @@ export function LeaderboardRow({ row, isCurrentUser = false }: LeaderboardRowPro
               </div>
 
               {/* Solved breakdown E / M / H */}
-              <div className="hidden sm:flex items-center gap-1 font-mono text-[11px] font-bold">
+              <div className="flex items-center gap-1 font-mono text-[11px] font-bold">
                 <span className="px-1.5 py-0.5 rounded bg-emerald-50 dark:bg-emerald-950/40 text-emerald-700 dark:text-emerald-400 border border-emerald-200/60 dark:border-emerald-800/60">
                   {row.easySolved ?? 0}E
                 </span>
@@ -152,26 +152,7 @@ export function LeaderboardRow({ row, isCurrentUser = false }: LeaderboardRowPro
           </div>
         </div>
 
-        {/* Right: Info modal trigger & profile action */}
-        <div className="flex sm:flex-col items-center sm:items-end justify-between sm:justify-center gap-2 pt-3 sm:pt-0 border-t sm:border-t-0 border-slate-100 dark:border-slate-800 shrink-0">
-          <div className="flex items-center gap-2">
-            <button
-              onClick={() => setShowFormulaModal(true)}
-              className="flex h-9 w-9 items-center justify-center rounded-full border border-slate-200 dark:border-slate-700 bg-slate-50 dark:bg-slate-800 text-slate-500 dark:text-slate-400 hover:text-blue-600 dark:hover:text-blue-400 hover:bg-blue-50 dark:hover:bg-blue-950/40 hover:border-blue-200 dark:hover:border-blue-800 transition-colors"
-              title="View Score Calculation Formula"
-            >
-              <Info className="h-4 w-4" />
-            </button>
-
-            <Link
-              href={`/profiles/${encodeURIComponent(row.leetcodeUsername)}`}
-              className="px-3.5 py-1.5 rounded-full text-xs font-bold text-slate-700 dark:text-slate-300 hover:text-blue-600 dark:hover:text-blue-400 hover:bg-slate-100 dark:hover:bg-slate-800 border border-slate-200 dark:border-slate-700 transition-all flex items-center gap-1.5"
-            >
-              <span>Profile</span>
-              <ExternalLink className="h-3 w-3" />
-            </Link>
-          </div>
-        </div>
+        {/* Action column removed per requirements */}
       </div>
 
       {showFormulaModal && (

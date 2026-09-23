@@ -51,7 +51,7 @@ export function ProfileSettingsForm({ initialData }: ProfileSettingsFormProps) {
     const values: Record<string, unknown> = {
       displayName: formData.get("displayName") as string,
       gender,
-      leetcodeUsername: formData.get("leetcodeUsername") as string,
+      // LeetCode Username is now updated via LeetCodeConnectCard
       admissionYear: admissionYear ? Number(admissionYear) : null,
       graduationYear: graduationYear ? Number(graduationYear) : null,
       branch: branch || null,
@@ -121,19 +121,7 @@ export function ProfileSettingsForm({ initialData }: ProfileSettingsFormProps) {
             {errors.displayName && <p className="text-xs text-rose-500 dark:text-[#f85149]">{errors.displayName[0]}</p>}
           </div>
 
-          <div className="space-y-1.5">
-            <label htmlFor="leetcodeUsername" className="text-xs font-medium text-slate-600 dark:text-[#848d97]">
-              LeetCode Username
-            </label>
-            <input
-              id="leetcodeUsername"
-              name="leetcodeUsername"
-              defaultValue={initialData.leetcodeUsername}
-              disabled={isPending}
-              className={inputCls}
-            />
-            {errors.leetcodeUsername && <p className="text-xs text-rose-500 dark:text-[#f85149]">{errors.leetcodeUsername[0]}</p>}
-          </div>
+
 
           <GenderSelect value={gender} onChange={setGender} error={errors.gender?.[0]} disabled={isPending} />
 

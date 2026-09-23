@@ -68,71 +68,33 @@ export function SymmetricalPanels({ male, female }: SymmetricalPanelsProps) {
         </div>
       </div>
 
-      <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
+      <div className="grid grid-cols-2 gap-4 sm:gap-6">
         {/* Female Panel */}
         <div className="card-hover relative flex flex-col justify-between p-6 rounded-2xl border border-pink-200/80 dark:border-pink-900/60 bg-white dark:bg-slate-900 shadow-sm transition-colors">
-          <div>
-            <div className="flex flex-col items-center justify-center pt-2 pb-5 border-b border-stone-100 dark:border-slate-800">
-              <StickmanAvatar gender="FEMALE" emotion={femaleEmotion} size={95} />
-              <div className="mt-3 text-center">
-                <span className="inline-flex items-center px-3 py-1 rounded-full text-xs font-black uppercase tracking-wider bg-pink-50 dark:bg-pink-950/40 text-pink-700 dark:text-pink-300 border border-pink-200 dark:border-pink-800 shadow-sm">
-                  Female Coders ({female.participantCount})
-                </span>
-                <p className="text-xs font-medium text-stone-500 dark:text-slate-400 mt-1.5 capitalize">
-                  Status: <strong className="text-stone-700 dark:text-slate-200">{femaleEmotion.toLowerCase().replace("_", " ")}</strong>
-                </p>
-              </div>
-            </div>
-            <div className="mt-5 space-y-3">
-              {[
-                { label: "Avg Solved / Student", val: fmt(female.avgSolvedPerStudent), bold: true },
-                { label: "Avg Hard Solved", val: fmt(female.avgHardPerStudent), bold: true },
-                { label: "Avg Contest Rating", val: female.avgContestRating ? String(Math.round(female.avgContestRating)) : "Unrated", bold: true },
-                { label: "Active Coders", val: `${female.activeCodersCount} / ${female.participantCount} (${female.participantCount > 0 ? Math.round((female.activeCodersCount / female.participantCount) * 100) : 0}%)`, bold: false },
-              ].map((m) => (
-                <div key={m.label} className="flex items-center justify-between pb-2.5 border-b border-stone-100 dark:border-slate-800">
-                  <span className="text-xs font-medium text-stone-500 dark:text-slate-400">{m.label}</span>
-                  <span className={`font-mono text-${m.bold ? "base font-black text-stone-900 dark:text-white" : "sm font-bold text-stone-800 dark:text-slate-200"}`}>{m.val}</span>
-                </div>
-              ))}
-              <div className="flex items-center justify-between pt-1">
-                <span className="text-xs font-medium text-stone-500 dark:text-slate-400">Total Group Solves</span>
-                <span className="font-mono text-xs font-bold text-stone-600 dark:text-slate-400">{fmtInt(female.totalSolved)} solves</span>
-              </div>
+          <div className="flex h-full flex-col items-center justify-center pt-2">
+            <StickmanAvatar gender="FEMALE" emotion={femaleEmotion} size={95} />
+            <div className="mt-3 text-center">
+              <span className="inline-flex items-center px-3 py-1 rounded-full text-xs font-black uppercase tracking-wider bg-pink-50 dark:bg-pink-950/40 text-pink-700 dark:text-pink-300 border border-pink-200 dark:border-pink-800 shadow-sm">
+                Female Coders ({female.participantCount})
+              </span>
+              <p className="text-xs font-medium text-stone-500 dark:text-slate-400 mt-1.5 capitalize">
+                Status: <strong className="text-stone-700 dark:text-slate-200">{femaleEmotion.toLowerCase().replace("_", " ")}</strong>
+              </p>
             </div>
           </div>
         </div>
 
         {/* Male Panel */}
         <div className="card-hover relative flex flex-col justify-between p-6 rounded-2xl border border-blue-200/80 dark:border-blue-900/60 bg-white dark:bg-slate-900 shadow-sm transition-colors">
-          <div>
-            <div className="flex flex-col items-center justify-center pt-2 pb-5 border-b border-stone-100 dark:border-slate-800">
-              <StickmanAvatar gender="MALE" emotion={maleEmotion} size={95} />
-              <div className="mt-3 text-center">
-                <span className="inline-flex items-center px-3 py-1 rounded-full text-xs font-black uppercase tracking-wider bg-blue-50 dark:bg-blue-950/40 text-blue-700 dark:text-blue-300 border border-blue-200 dark:border-blue-800 shadow-sm">
-                  Male Coders ({male.participantCount})
-                </span>
-                <p className="text-xs font-medium text-stone-500 dark:text-slate-400 mt-1.5 capitalize">
-                  Status: <strong className="text-stone-700 dark:text-slate-200">{maleEmotion.toLowerCase().replace("_", " ")}</strong>
-                </p>
-              </div>
-            </div>
-            <div className="mt-5 space-y-3">
-              {[
-                { label: "Avg Solved / Student", val: fmt(male.avgSolvedPerStudent), bold: true },
-                { label: "Avg Hard Solved", val: fmt(male.avgHardPerStudent), bold: true },
-                { label: "Avg Contest Rating", val: male.avgContestRating ? String(Math.round(male.avgContestRating)) : "Unrated", bold: true },
-                { label: "Active Coders", val: `${male.activeCodersCount} / ${male.participantCount} (${male.participantCount > 0 ? Math.round((male.activeCodersCount / male.participantCount) * 100) : 0}%)`, bold: false },
-              ].map((m) => (
-                <div key={m.label} className="flex items-center justify-between pb-2.5 border-b border-stone-100 dark:border-slate-800">
-                  <span className="text-xs font-medium text-stone-500 dark:text-slate-400">{m.label}</span>
-                  <span className={`font-mono text-${m.bold ? "base font-black text-stone-900 dark:text-white" : "sm font-bold text-stone-800 dark:text-slate-200"}`}>{m.val}</span>
-                </div>
-              ))}
-              <div className="flex items-center justify-between pt-1">
-                <span className="text-xs font-medium text-stone-500 dark:text-slate-400">Total Group Solves</span>
-                <span className="font-mono text-xs font-bold text-stone-600 dark:text-slate-400">{fmtInt(male.totalSolved)} solves</span>
-              </div>
+          <div className="flex h-full flex-col items-center justify-center pt-2">
+            <StickmanAvatar gender="MALE" emotion={maleEmotion} size={95} />
+            <div className="mt-3 text-center">
+              <span className="inline-flex items-center px-3 py-1 rounded-full text-xs font-black uppercase tracking-wider bg-blue-50 dark:bg-blue-950/40 text-blue-700 dark:text-blue-300 border border-blue-200 dark:border-blue-800 shadow-sm">
+                Male Coders ({male.participantCount})
+              </span>
+              <p className="text-xs font-medium text-stone-500 dark:text-slate-400 mt-1.5 capitalize">
+                Status: <strong className="text-stone-700 dark:text-slate-200">{maleEmotion.toLowerCase().replace("_", " ")}</strong>
+              </p>
             </div>
           </div>
         </div>

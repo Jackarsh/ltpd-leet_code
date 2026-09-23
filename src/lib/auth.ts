@@ -16,7 +16,7 @@ export const { handlers, signIn, signOut, auth } = NextAuth({
   adapter: PrismaAdapter(db),
   callbacks: {
     ...authConfig.callbacks,
-    async jwt({ token, user }) {
+    async jwt({ token, user, trigger, session }) {
       if (user) {
         token.id = user.id;
         // Fetch profile for display name
@@ -27,6 +27,7 @@ export const { handlers, signIn, signOut, auth } = NextAuth({
           token.name = profile.displayName;
           token.gender = profile.gender;
           token.leetcodeUsername = profile.leetcodeUsername;
+          token.needsOnboarding = profile.branch === null;
         }
         // Fetch role
         const dbUser = await db.user.findUnique({
@@ -37,6 +38,9 @@ export const { handlers, signIn, signOut, auth } = NextAuth({
           token.role = dbUser.role;
         }
       }
+      if (trigger === "update" && session?.needsOnboarding === false) {
+        token.needsOnboarding = false;
+      }
       return token;
     },
     async session({ session, token }) {
@@ -46,6 +50,7 @@ export const { handlers, signIn, signOut, auth } = NextAuth({
         userObj.role = token.role;
         userObj.gender = token.gender;
         userObj.leetcodeUsername = token.leetcodeUsername;
+        userObj.needsOnboarding = token.needsOnboarding;
       }
       return session;
     },
