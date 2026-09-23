@@ -82,15 +82,15 @@ export function AchievementGallery({
   });
 
   return (
-    <div className="rounded-2xl border border-zinc-800 bg-zinc-900/60 p-6 backdrop-blur-md shadow-lg mb-8">
+    <div className="rounded-2xl border border-slate-200 dark:border-slate-800 bg-white dark:bg-slate-900 p-6 shadow-sm mb-8">
       {/* Header & Category Filters */}
       <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-4 mb-6">
         <div className="flex items-center gap-2">
-          <Award className="h-5 w-5 text-amber-400" />
-          <h2 className="text-base font-bold text-zinc-100 uppercase tracking-wider">
+          <Award className="h-5 w-5 text-amber-500 dark:text-amber-400" />
+          <h2 className="text-base font-bold text-slate-900 dark:text-white uppercase tracking-wider">
             Collegiate Achievements
           </h2>
-          <span className="rounded-full bg-amber-500/10 px-2 py-0.5 text-xs font-bold text-amber-400 border border-amber-500/20">
+          <span className="rounded-full bg-amber-500/10 px-2 py-0.5 text-xs font-bold text-amber-600 dark:text-amber-400 border border-amber-500/20">
             {achievements.length} Unlocked
           </span>
         </div>
@@ -103,8 +103,8 @@ export function AchievementGallery({
               onClick={() => setSelectedCategory(c.key)}
               className={`rounded-lg px-3 py-1.5 text-xs font-medium transition-colors ${
                 selectedCategory === c.key
-                  ? "bg-indigo-600 text-white"
-                  : "bg-zinc-950 text-zinc-400 hover:text-zinc-200 border border-zinc-850"
+                  ? "bg-blue-600 text-white shadow-sm"
+                  : "bg-slate-100 dark:bg-slate-800 text-slate-600 dark:text-slate-400 hover:text-slate-900 dark:hover:text-white border border-slate-200 dark:border-slate-700"
               }`}
             >
               {c.label}
@@ -119,22 +119,22 @@ export function AchievementGallery({
           {filteredEarned.map((badge) => (
             <div
               key={badge.id}
-              className={`relative rounded-xl border p-4 transition-all duration-200 backdrop-blur-sm ${
+              className={`relative rounded-xl border p-4 transition-all duration-200 ${
                 badge.isRevoked
-                  ? "bg-rose-950/10 border-rose-900/40 opacity-75"
+                  ? "bg-rose-50 dark:bg-rose-950/10 border-rose-200 dark:border-rose-900/40 opacity-75"
                   : badge.isLegacy
-                  ? "bg-zinc-950/40 border-zinc-700/60"
-                  : "bg-zinc-950/70 border-zinc-800 hover:border-zinc-700 hover:bg-zinc-900/50"
+                  ? "bg-slate-100/50 dark:bg-slate-950/40 border-slate-200 dark:border-slate-700/60"
+                  : "bg-slate-50 dark:bg-slate-950/70 border-slate-200 dark:border-slate-800 hover:border-slate-300 dark:hover:border-slate-700 hover:bg-slate-100/80 dark:hover:bg-slate-900/50 shadow-xs"
               }`}
             >
               <div className="flex items-start gap-3.5">
-                <div className="rounded-xl bg-zinc-900 p-2.5 border border-zinc-800 shrink-0">
+                <div className="rounded-xl bg-white dark:bg-slate-900 p-2.5 border border-slate-200 dark:border-slate-800 shrink-0 shadow-xs">
                   {getBadgeIcon(badge.iconKey)}
                 </div>
 
                 <div className="min-w-0 flex-1">
                   <div className="flex items-center justify-between gap-1 mb-1">
-                    <h3 className="font-bold text-sm text-zinc-100 truncate">{badge.name}</h3>
+                    <h3 className="font-bold text-sm text-slate-900 dark:text-white truncate">{badge.name}</h3>
                     {badge.rarityLevel && (
                       <span
                         className={`rounded px-1.5 py-0.5 text-[9px] font-bold uppercase tracking-wider border ${getRarityBadge(
@@ -146,22 +146,22 @@ export function AchievementGallery({
                     )}
                   </div>
 
-                  <p className="text-xs text-zinc-400 line-clamp-2 mb-2">{badge.description}</p>
+                  <p className="text-xs text-slate-500 dark:text-slate-400 line-clamp-2 mb-2">{badge.description}</p>
 
-                  <div className="flex items-center justify-between text-[10px] text-zinc-400 pt-1 border-t border-zinc-850">
+                  <div className="flex items-center justify-between text-[10px] text-slate-500 dark:text-slate-400 pt-1 border-t border-slate-200 dark:border-slate-800">
                     <span>
                       Earned {new Date(badge.unlockedAt).toLocaleDateString([], { month: "short", day: "numeric", year: "numeric" })}
                     </span>
 
                     {badge.isRevoked && (
-                      <span className="flex items-center gap-1 text-rose-400 font-semibold">
+                      <span className="flex items-center gap-1 text-rose-500 dark:text-rose-400 font-semibold">
                         <AlertCircle className="h-3 w-3" />
                         Revoked
                       </span>
                     )}
 
                     {badge.isLegacy && (
-                      <span className="flex items-center gap-1 text-zinc-400 font-medium">
+                      <span className="flex items-center gap-1 text-slate-400 font-medium">
                         <Archive className="h-3 w-3" />
                         Legacy
                       </span>
@@ -173,16 +173,16 @@ export function AchievementGallery({
           ))}
         </div>
       ) : (
-        <div className="rounded-xl bg-zinc-950/50 border border-zinc-850 p-6 text-center text-xs text-zinc-400 mb-6">
+        <div className="rounded-xl bg-slate-50 dark:bg-slate-950/50 border border-slate-200 dark:border-slate-800 p-6 text-center text-xs text-slate-500 dark:text-slate-400 mb-6">
           No achievements earned in this category yet.
         </div>
       )}
 
       {/* Locked Achievements (Owner Only - FR-333, FR-334) */}
       {filteredLocked.length > 0 && (
-        <div className="mt-8 pt-6 border-t border-zinc-800/80">
-          <div className="flex items-center gap-2 mb-4 text-xs font-bold text-zinc-400 uppercase tracking-wider">
-            <Lock className="h-3.5 w-3.5 text-zinc-400" />
+        <div className="mt-8 pt-6 border-t border-slate-200 dark:border-slate-800/80">
+          <div className="flex items-center gap-2 mb-4 text-xs font-bold text-slate-500 dark:text-slate-400 uppercase tracking-wider">
+            <Lock className="h-3.5 w-3.5 text-slate-400" />
             <span>Locked Milestones ({filteredLocked.length})</span>
           </div>
 
@@ -190,17 +190,17 @@ export function AchievementGallery({
             {filteredLocked.map((badge) => (
               <div
                 key={badge.id}
-                className="rounded-xl border border-zinc-850/80 bg-zinc-950/30 p-4 opacity-60 hover:opacity-100 transition-opacity"
+                className="rounded-xl border border-slate-200 dark:border-slate-800 bg-slate-50 dark:bg-slate-950/30 p-4 opacity-70 hover:opacity-100 transition-opacity"
               >
                 <div className="flex items-start gap-3.5">
-                  <div className="rounded-xl bg-zinc-900/60 p-2.5 border border-zinc-850 shrink-0 text-zinc-400">
+                  <div className="rounded-xl bg-white dark:bg-slate-900/60 p-2.5 border border-slate-200 dark:border-slate-800 shrink-0 text-slate-400">
                     <Lock className="h-6 w-6" />
                   </div>
 
                   <div className="min-w-0 flex-1">
-                    <h3 className="font-bold text-sm text-zinc-300 truncate">{badge.name}</h3>
-                    <p className="text-xs text-zinc-400 line-clamp-1 mb-2">{badge.description}</p>
-                    <div className="rounded-md bg-zinc-900 px-2 py-1 text-[11px] text-indigo-300 border border-zinc-800">
+                    <h3 className="font-bold text-sm text-slate-800 dark:text-slate-300 truncate">{badge.name}</h3>
+                    <p className="text-xs text-slate-500 dark:text-slate-400 line-clamp-1 mb-2">{badge.description}</p>
+                    <div className="rounded-md bg-white dark:bg-slate-900 px-2 py-1 text-[11px] text-blue-600 dark:text-indigo-300 border border-slate-200 dark:border-slate-800">
                       {badge.conditionText}
                     </div>
                   </div>

@@ -30,7 +30,7 @@ export default async function PublicProfilePage({ params }: Props) {
   }
 
   return (
-    <div className="min-h-screen bg-[#0d1117] text-[#f0f6fc] py-8 px-4 sm:px-6 lg:px-8 max-w-6xl mx-auto">
+    <div className="min-h-screen py-8 px-4 sm:px-6 lg:px-8 max-w-6xl mx-auto">
       {/* Student Identity Header */}
       <ProfileHeader profile={profile} />
 

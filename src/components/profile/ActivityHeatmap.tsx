@@ -13,10 +13,10 @@ export function ActivityHeatmap({ days, metrics }: ActivityHeatmapProps) {
   const [hoveredDay, setHoveredDay] = useState<HeatmapDayDTO | null>(null);
 
   const getShadeClass = (count: number) => {
-    if (count === 0) return "bg-zinc-900 border-zinc-850 hover:border-zinc-700";
-    if (count <= 2) return "bg-emerald-950/80 border-emerald-900/60 hover:border-emerald-600";
-    if (count <= 5) return "bg-emerald-700/80 border-emerald-600/60 hover:border-emerald-400";
-    return "bg-emerald-500 border-emerald-400 hover:border-emerald-300";
+    if (count === 0) return "bg-slate-100 dark:bg-slate-800 border-slate-200 dark:border-slate-700/60 hover:border-slate-400";
+    if (count <= 2) return "bg-emerald-200 dark:bg-emerald-950/80 border-emerald-300 dark:border-emerald-900/60 hover:border-emerald-500";
+    if (count <= 5) return "bg-emerald-400 dark:bg-emerald-700/80 border-emerald-500 dark:border-emerald-600/60 hover:border-emerald-300";
+    return "bg-emerald-600 dark:bg-emerald-500 border-emerald-700 dark:border-emerald-400 hover:border-emerald-200";
   };
 
   // Group days into columns of 7 days (weeks)
@@ -32,21 +32,21 @@ export function ActivityHeatmap({ days, metrics }: ActivityHeatmapProps) {
   });
 
   return (
-    <div className="rounded-2xl border border-zinc-800 bg-zinc-900/60 p-6 backdrop-blur-md shadow-lg mb-8">
+    <div className="rounded-2xl border border-slate-200 dark:border-slate-800 bg-white dark:bg-slate-900 p-6 shadow-sm mb-8">
       {/* Header with Hover Inspection */}
       <div className="flex flex-col sm:flex-row items-start sm:items-center justify-between gap-2 mb-4">
-        <div className="flex items-center gap-2 text-sm font-bold text-zinc-200 uppercase tracking-wider">
-          <Calendar className="h-4 w-4 text-emerald-400" />
+        <div className="flex items-center gap-2 text-sm font-bold text-slate-800 dark:text-slate-200 uppercase tracking-wider">
+          <Calendar className="h-4 w-4 text-emerald-600 dark:text-emerald-400" />
           <span>12-Month Submission Heatmap (Accepted Only)</span>
         </div>
 
-        <div className="text-xs text-zinc-300 font-mono h-5 flex items-center">
+        <div className="text-xs text-slate-600 dark:text-slate-300 font-mono h-5 flex items-center">
           {hoveredDay ? (
-            <span className="text-emerald-400 font-medium">
+            <span className="text-emerald-600 dark:text-emerald-400 font-medium">
               {hoveredDay.count} {hoveredDay.count === 1 ? "solve" : "solves"} on {hoveredDay.date}
             </span>
           ) : (
-            <span className="text-zinc-400">Hover day to inspect</span>
+            <span className="text-slate-400 dark:text-slate-500">Hover day to inspect</span>
           )}
         </div>
       </div>
@@ -73,80 +73,80 @@ export function ActivityHeatmap({ days, metrics }: ActivityHeatmapProps) {
       </div>
 
       {/* Legend */}
-      <div className="flex items-center justify-between mt-3 text-[11px] text-zinc-400 border-t border-zinc-800/80 pt-3">
+      <div className="flex items-center justify-between mt-3 text-[11px] text-slate-500 dark:text-slate-400 border-t border-slate-100 dark:border-slate-800 pt-3">
         <div className="flex items-center gap-1">
-          <Info className="h-3 w-3 text-zinc-400" />
+          <Info className="h-3 w-3 text-slate-400" />
           <span>Counts verified accepted submissions only</span>
         </div>
         <div className="flex items-center gap-1.5">
           <span>Less</span>
-          <span className="h-2.5 w-2.5 rounded-xs bg-zinc-900 border border-zinc-850" />
-          <span className="h-2.5 w-2.5 rounded-xs bg-emerald-950/80 border border-emerald-900/60" />
-          <span className="h-2.5 w-2.5 rounded-xs bg-emerald-700/80 border border-emerald-600/60" />
-          <span className="h-2.5 w-2.5 rounded-xs bg-emerald-500 border border-emerald-400" />
+          <span className="h-2.5 w-2.5 rounded-xs bg-slate-100 dark:bg-slate-800 border border-slate-200 dark:border-slate-700" />
+          <span className="h-2.5 w-2.5 rounded-xs bg-emerald-200 dark:bg-emerald-950/80 border border-emerald-300 dark:border-emerald-900/60" />
+          <span className="h-2.5 w-2.5 rounded-xs bg-emerald-400 dark:bg-emerald-700/80 border border-emerald-500 dark:border-emerald-600/60" />
+          <span className="h-2.5 w-2.5 rounded-xs bg-emerald-600 dark:bg-emerald-500 border border-emerald-700 dark:border-emerald-400" />
           <span>More</span>
         </div>
       </div>
 
       {/* The 6 Key Activity Summary Metrics (FR-317) */}
-      <div className="mt-6 pt-5 border-t border-zinc-800 grid grid-cols-2 sm:grid-cols-3 lg:grid-cols-6 gap-3">
+      <div className="mt-6 pt-5 border-t border-slate-100 dark:border-slate-800 grid grid-cols-2 sm:grid-cols-3 lg:grid-cols-6 gap-3">
         {/* Metric 1: Daily Activity */}
-        <div className="rounded-xl bg-zinc-950/70 border border-zinc-800/80 p-3">
-          <div className="text-[10px] font-semibold text-zinc-400 uppercase tracking-wider mb-1">
+        <div className="rounded-xl bg-slate-50 dark:bg-slate-950/70 border border-slate-200 dark:border-slate-800/80 p-3">
+          <div className="text-[10px] font-semibold text-slate-500 dark:text-slate-400 uppercase tracking-wider mb-1">
             Recent Daily
           </div>
-          <div className="text-xl font-bold text-zinc-100 font-mono">
-            {metrics.dailyActivity} <span className="text-xs text-zinc-400 font-sans">solves</span>
+          <div className="text-xl font-bold text-slate-900 dark:text-slate-100 font-mono">
+            {metrics.dailyActivity} <span className="text-xs text-slate-500 dark:text-slate-400 font-sans">solves</span>
           </div>
         </div>
 
         {/* Metric 2: Active Days */}
-        <div className="rounded-xl bg-zinc-950/70 border border-zinc-800/80 p-3">
-          <div className="text-[10px] font-semibold text-zinc-400 uppercase tracking-wider mb-1">
+        <div className="rounded-xl bg-slate-50 dark:bg-slate-950/70 border border-slate-200 dark:border-slate-800/80 p-3">
+          <div className="text-[10px] font-semibold text-slate-500 dark:text-slate-400 uppercase tracking-wider mb-1">
             Active Days
           </div>
-          <div className="text-xl font-bold text-emerald-400 font-mono">
-            {metrics.activeDays} <span className="text-xs text-zinc-400 font-sans">days</span>
+          <div className="text-xl font-bold text-emerald-600 dark:text-emerald-400 font-mono">
+            {metrics.activeDays} <span className="text-xs text-slate-500 dark:text-slate-400 font-sans">days</span>
           </div>
         </div>
 
         {/* Metric 3: Current Streak */}
-        <div className="rounded-xl bg-zinc-950/70 border border-zinc-800/80 p-3">
-          <div className="text-[10px] font-semibold text-zinc-400 uppercase tracking-wider mb-1 flex items-center gap-1">
-            <Flame className="h-3 w-3 text-amber-400" />
+        <div className="rounded-xl bg-slate-50 dark:bg-slate-950/70 border border-slate-200 dark:border-slate-800/80 p-3">
+          <div className="text-[10px] font-semibold text-slate-500 dark:text-slate-400 uppercase tracking-wider mb-1 flex items-center gap-1">
+            <Flame className="h-3 w-3 text-amber-500" />
             <span>Streak</span>
           </div>
-          <div className="text-xl font-bold text-amber-400 font-mono">
-            {metrics.currentStreak} <span className="text-xs text-zinc-400 font-sans">days</span>
+          <div className="text-xl font-bold text-amber-600 dark:text-amber-400 font-mono">
+            {metrics.currentStreak} <span className="text-xs text-slate-500 dark:text-slate-400 font-sans">days</span>
           </div>
         </div>
 
         {/* Metric 4: Longest Streak */}
-        <div className="rounded-xl bg-zinc-950/70 border border-zinc-800/80 p-3">
-          <div className="text-[10px] font-semibold text-zinc-400 uppercase tracking-wider mb-1">
+        <div className="rounded-xl bg-slate-50 dark:bg-slate-950/70 border border-slate-200 dark:border-slate-800/80 p-3">
+          <div className="text-[10px] font-semibold text-slate-500 dark:text-slate-400 uppercase tracking-wider mb-1">
             Longest Streak
           </div>
-          <div className="text-xl font-bold text-zinc-100 font-mono">
-            {metrics.longestStreak} <span className="text-xs text-zinc-400 font-sans">days</span>
+          <div className="text-xl font-bold text-slate-900 dark:text-slate-100 font-mono">
+            {metrics.longestStreak} <span className="text-xs text-slate-500 dark:text-slate-400 font-sans">days</span>
           </div>
         </div>
 
         {/* Metric 5: Total Activity */}
-        <div className="rounded-xl bg-zinc-950/70 border border-zinc-800/80 p-3">
-          <div className="text-[10px] font-semibold text-zinc-400 uppercase tracking-wider mb-1">
+        <div className="rounded-xl bg-slate-50 dark:bg-slate-950/70 border border-slate-200 dark:border-slate-800/80 p-3">
+          <div className="text-[10px] font-semibold text-slate-500 dark:text-slate-400 uppercase tracking-wider mb-1">
             Total Solves
           </div>
-          <div className="text-xl font-bold text-zinc-100 font-mono">
+          <div className="text-xl font-bold text-slate-900 dark:text-slate-100 font-mono">
             {metrics.totalActivity}
           </div>
         </div>
 
         {/* Metric 6: Average Activity on Active Days */}
-        <div className="rounded-xl bg-zinc-950/70 border border-zinc-800/80 p-3">
-          <div className="text-[10px] font-semibold text-zinc-400 uppercase tracking-wider mb-1">
+        <div className="rounded-xl bg-slate-50 dark:bg-slate-950/70 border border-slate-200 dark:border-slate-800/80 p-3">
+          <div className="text-[10px] font-semibold text-slate-500 dark:text-slate-400 uppercase tracking-wider mb-1">
             Avg / Active Day
           </div>
-          <div className="text-xl font-bold text-zinc-100 font-mono">
+          <div className="text-xl font-bold text-slate-900 dark:text-slate-100 font-mono">
             {metrics.averageActivityOnActiveDays !== null ? metrics.averageActivityOnActiveDays : "—"}
           </div>
         </div>
