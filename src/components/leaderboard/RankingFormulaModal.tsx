@@ -1,6 +1,6 @@
 "use client";
 
-import { X, Award, CheckCircle2 } from "lucide-react";
+import { X } from "lucide-react";
 import { ScoreBreakdownDTO } from "@/types/leaderboard";
 import { RANKING_CONFIG } from "@/lib/ranking-config";
 
@@ -33,7 +33,6 @@ export function RankingFormulaModal({
         {/* Header */}
         <div className="mb-5 border-b border-slate-100 dark:border-slate-800 pb-4">
           <div className="flex items-center gap-2 mb-1">
-            <Award className="h-5 w-5 text-blue-600 dark:text-blue-400" />
             <h2 className="text-lg font-black tracking-tight text-slate-900 dark:text-white">
               {studentName ? `${studentName}'s Score Breakdown` : "College Ranking Methodology"}
             </h2>
@@ -112,8 +111,7 @@ export function RankingFormulaModal({
           </div>
           <div className="space-y-1.5 text-xs text-slate-600 dark:text-slate-300">
             {RANKING_CONFIG.tieBreakingSequence.map((rule, idx) => (
-              <div key={idx} className="flex items-start gap-2">
-                <CheckCircle2 className="h-3.5 w-3.5 text-blue-500 dark:text-blue-400 shrink-0 mt-0.5" />
+              <div key={idx} className="flex items-start">
                 <span className="font-medium text-slate-700 dark:text-slate-300">{rule}</span>
               </div>
             ))}

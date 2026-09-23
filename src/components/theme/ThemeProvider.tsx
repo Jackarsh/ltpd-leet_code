@@ -20,8 +20,12 @@ export function ThemeProvider({ children }: { children: React.ReactNode }) {
   const [theme, setThemeState] = useState<Theme>("light");
 
   useEffect(() => {
+    if (localStorage.getItem("theme_default_light_v1") !== "true") {
+      localStorage.setItem("theme", "light");
+      localStorage.setItem("theme_default_light_v1", "true");
+    }
     const saved = localStorage.getItem("theme") as Theme | null;
-    if (saved === "dark" || (!saved && window.matchMedia("(prefers-color-scheme: dark)").matches)) {
+    if (saved === "dark") {
       setThemeState("dark");
       document.documentElement.classList.add("dark");
     } else {

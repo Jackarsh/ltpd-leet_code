@@ -29,8 +29,7 @@ export function LeaderboardHero({ topStudent, totalCoders }: LeaderboardHeroProp
                 <div className="absolute top-0 left-0 right-0 h-1 bg-gradient-to-r from-blue-500 via-sky-400 to-indigo-500" />
 
                 <div className="flex items-center justify-between gap-2 mb-4">
-                  <span className="inline-flex items-center gap-1.5 px-3 py-1 rounded-full text-[11px] font-black uppercase tracking-wider bg-amber-400/15 text-amber-300 border border-amber-400/30 shadow-sm">
-                    <Trophy className="h-3.5 w-3.5 text-amber-400" />
+                  <span className="inline-flex items-center px-3 py-1 rounded-full text-[11px] font-black uppercase tracking-wider bg-amber-400/15 text-amber-300 border border-amber-400/30 shadow-sm">
                     #1 College Leader
                   </span>
                   <span className="text-xs font-mono text-slate-400">
