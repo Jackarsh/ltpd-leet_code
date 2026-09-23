@@ -208,3 +208,43 @@ export async function toggleUserAccountStatus(
 
   return updated;
 }
+
+/**
+ * Permanently deletes a user account and writes an audit log record.
+ * Prevents deleting the final Super Admin.
+ */
+export async function deleteUserAsAdmin(
+  adminUserId: string,
+  targetUserId: string,
+  context?: { ipAddress?: string; userAgent?: string }
+) {
+  await assertWillNotCauseLockout(targetUserId);
+
+  const existingUser = await db.user.findUnique({
+    where: { id: targetUserId },
+    select: { id: true, email: true },
+  });
+
+  if (!existingUser) {
+    throw new Error("User account not found.");
+  }
+
+  const beforeState = { id: existingUser.id, email: existingUser.email };
+
+  await db.user.delete({
+    where: { id: targetUserId },
+  });
+
+  await recordAuditLog({
+    adminUserId,
+    actionType: "USER_DELETE",
+    targetType: "USER",
+    targetId: targetUserId,
+    beforeState,
+    afterState: null,
+    ipAddress: context?.ipAddress,
+    userAgent: context?.userAgent,
+  });
+
+  return { success: true };
+}

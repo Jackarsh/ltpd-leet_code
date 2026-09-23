@@ -15,6 +15,7 @@ import {
   ChevronRight,
   Shield,
   ExternalLink,
+  Trash2,
 } from "lucide-react";
 import { useRouter, useSearchParams } from "next/navigation";
 
@@ -44,6 +45,11 @@ export function UserManagementTable({
   const [statusTargetUser, setStatusTargetUser] = useState<AdminUserListItemDTO | null>(null);
   const [isStatusModalOpen, setIsStatusModalOpen] = useState(false);
   const [statusActionPending, setStatusActionPending] = useState(false);
+
+  // Delete confirmation state
+  const [deleteTargetUser, setDeleteTargetUser] = useState<AdminUserListItemDTO | null>(null);
+  const [isDeleteModalOpen, setIsDeleteModalOpen] = useState(false);
+  const [deleteActionPending, setDeleteActionPending] = useState(false);
 
   // Filter state
   const [searchTerm, setSearchTerm] = useState(searchParams.get("search") || "");
@@ -109,6 +115,30 @@ export function UserManagementTable({
       alert(err instanceof Error ? err.message : "Failed to toggle account status.");
     } finally {
       setStatusActionPending(false);
+    }
+  };
+
+  const handleDeleteConfirm = async () => {
+    if (!deleteTargetUser) return;
+    setDeleteActionPending(true);
+
+    try {
+      const res = await fetch(`/api/admin/users/${deleteTargetUser.id}`, {
+        method: "DELETE",
+      });
+
+      const data = await res.json();
+      if (!res.ok) {
+        throw new Error(data.error || "Failed to delete user.");
+      }
+
+      setUsers((prev) => prev.filter((u) => u.id !== deleteTargetUser.id));
+      setIsDeleteModalOpen(false);
+      setDeleteTargetUser(null);
+    } catch (err: unknown) {
+      alert(err instanceof Error ? err.message : "Failed to delete account.");
+    } finally {
+      setDeleteActionPending(false);
     }
   };
 
@@ -312,6 +342,18 @@ export function UserManagementTable({
                           >
                             {isActive ? <UserX className="h-4 w-4" /> : <UserCheck className="h-4 w-4" />}
                           </button>
+
+                          <button
+                            type="button"
+                            onClick={() => {
+                              setDeleteTargetUser(u);
+                              setIsDeleteModalOpen(true);
+                            }}
+                            title="Delete Account"
+                            className="rounded-lg p-1.5 text-red-400/80 hover:bg-red-500/10 hover:text-red-300 transition-colors"
+                          >
+                            <Trash2 className="h-4 w-4" />
+                          </button>
                         </div>
                       </td>
                     </tr>
@@ -387,6 +429,21 @@ export function UserManagementTable({
         confirmWord="CONFIRM"
         isDestructive={statusTargetUser?.status === "ACTIVE"}
         isPending={statusActionPending}
+      />
+
+      {/* Delete User Step-Up Modal */}
+      <StepUpConfirmModal
+        isOpen={isDeleteModalOpen}
+        onClose={() => {
+          setIsDeleteModalOpen(false);
+          setDeleteTargetUser(null);
+        }}
+        onConfirm={handleDeleteConfirm}
+        title={`Permanently Delete User: ${deleteTargetUser?.displayName}`}
+        description="Deleting this account is permanent and irreversible. All associated coding accounts, stats, and achievements will be destroyed. This action cannot be undone."
+        confirmWord="DELETE"
+        isDestructive={true}
+        isPending={deleteActionPending}
       />
     </div>
   );

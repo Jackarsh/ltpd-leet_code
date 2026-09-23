@@ -4,6 +4,7 @@ import { redirect } from "next/navigation";
 import { ProfileSettingsForm } from "@/components/profile/ProfileSettingsForm";
 import { LeetCodeConnectCard } from "@/components/profile/LeetCodeConnectCard";
 import { AppearanceSettings } from "@/components/profile/AppearanceSettings";
+import { DeleteAccountCard } from "@/components/profile/DeleteAccountCard";
 
 export const metadata = {
   title: "Profile Settings | College Coding Platform",
@@ -54,6 +55,9 @@ export default async function ProfileSettingsPage() {
             email: user.email,
           }}
         />
+
+        {/* Danger Zone */}
+        <DeleteAccountCard />
       </div>
     </div>
   );

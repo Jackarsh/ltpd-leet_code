@@ -34,12 +34,14 @@ export default auth((req) => {
   const needsOnboarding = (req.auth?.user as { needsOnboarding?: boolean })?.needsOnboarding;
 
   if (isPublicRoute || isPublicPrefix) {
-    // Redirect logged-in users away from auth pages
-    if (isLoggedIn && pathname.startsWith("/auth/") && pathname !== "/auth/onboarding") {
-      if (needsOnboarding) {
+    if (isLoggedIn && !isApiRoute && !pathname.startsWith("/api/auth/")) {
+      if (needsOnboarding && pathname !== "/auth/onboarding") {
         return NextResponse.redirect(new URL("/auth/onboarding", nextUrl));
       }
-      return NextResponse.redirect(new URL("/dashboard", nextUrl));
+      // Redirect logged-in users away from auth pages
+      if (pathname.startsWith("/auth/") && pathname !== "/auth/onboarding") {
+        return NextResponse.redirect(new URL("/dashboard", nextUrl));
+      }
     }
     return NextResponse.next();
   }

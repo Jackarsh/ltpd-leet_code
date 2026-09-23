@@ -40,7 +40,7 @@ export default function OnboardingPage() {
         const errMsg = typeof err === "string" ? err : Object.values(err).flat().join(", ");
         setError(errMsg);
       } else {
-        await update(); // This triggers the jwt callback with trigger="update"
+        await update({ needsOnboarding: false }); // This triggers the jwt callback with trigger="update"
         router.push("/dashboard");
       }
     });

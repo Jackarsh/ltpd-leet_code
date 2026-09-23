@@ -20,6 +20,7 @@ export const authConfig: NextAuthConfig = {
         userObj.role = token.role;
         userObj.gender = token.gender;
         userObj.leetcodeUsername = token.leetcodeUsername;
+        userObj.needsOnboarding = token.needsOnboarding;
       }
       return session;
     },
