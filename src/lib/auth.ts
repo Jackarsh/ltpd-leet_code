@@ -5,18 +5,17 @@ import { db } from "@/lib/db";
 import { LoginSchema } from "@/lib/validations/auth";
 import bcrypt from "bcryptjs";
 
+import { authConfig } from "@/lib/auth.config";
+
 // FR-032: Lockout after 5 consecutive failed attempts for 15 minutes
 const MAX_FAILED_ATTEMPTS = 5;
 const LOCKOUT_DURATION_MS = 15 * 60 * 1000; // 15 minutes
 
 export const { handlers, signIn, signOut, auth } = NextAuth({
+  ...authConfig,
   adapter: PrismaAdapter(db),
-  session: { strategy: "jwt" },
-  pages: {
-    signIn: "/auth/login",
-    error: "/auth/error",
-  },
   callbacks: {
+    ...authConfig.callbacks,
     async jwt({ token, user }) {
       if (user) {
         token.id = user.id;
