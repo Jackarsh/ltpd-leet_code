@@ -3,8 +3,7 @@ import { db } from "@/lib/db";
 import { redirect } from "next/navigation";
 import { ProfileSettingsForm } from "@/components/profile/ProfileSettingsForm";
 import { LeetCodeConnectCard } from "@/components/profile/LeetCodeConnectCard";
-import Link from "next/link";
-import { ArrowRight } from "lucide-react";
+import { AppearanceSettings } from "@/components/profile/AppearanceSettings";
 
 export const metadata = {
   title: "Profile Settings | College Coding Platform",
@@ -33,6 +32,9 @@ export default async function ProfileSettingsPage() {
       </div>
 
       <div className="space-y-6">
+        {/* Appearance */}
+        <AppearanceSettings />
+
         {/* LeetCode Account Connect & Verify */}
         <LeetCodeConnectCard
           currentUsername={leetcodeAccount?.username || user.profile.leetcodeUsername}

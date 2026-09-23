@@ -5,6 +5,8 @@ import { signIn } from "next-auth/react";
 import { useRouter } from "next/navigation";
 import { register } from "@/server/actions/register";
 import { GenderSelect } from "@/components/ui/GenderSelect";
+import { BranchSelect } from "@/components/ui/BranchSelect";
+import { BatchSelect } from "@/components/ui/BatchSelect";
 import { Loader2 } from "lucide-react";
 import Link from "next/link";
 import { isFirebaseConfigured } from "@/lib/firebase/config";
@@ -53,6 +55,10 @@ export function RegisterForm() {
   const [success, setSuccess] = useState<string | null>(null);
   const [devVerifyUrl, setDevVerifyUrl] = useState<string | null>(null);
   const [gender, setGender] = useState<string>("");
+  // Controlled state for academic dropdown fields (T014, T016)
+  const [branch, setBranch] = useState("");
+  const [admissionYear, setAdmissionYear] = useState("");
+  const [graduationYear, setGraduationYear] = useState("");
 
   const handleSocialLogin = async (provider: "google" | "apple") => {
     setSocialLoading(provider);
@@ -96,9 +102,9 @@ export function RegisterForm() {
       password: formData.get("password") as string,
       leetcodeUsername: formData.get("leetcodeUsername") as string,
       gender: gender as "MALE" | "FEMALE",
-      admissionYear: formData.get("admissionYear") ? Number(formData.get("admissionYear")) : undefined,
-      graduationYear: formData.get("graduationYear") ? Number(formData.get("graduationYear")) : undefined,
-      branch: (formData.get("branch") as string) || undefined,
+      admissionYear: admissionYear ? Number(admissionYear) : undefined,
+      graduationYear: graduationYear ? Number(graduationYear) : undefined,
+      branch: branch || undefined,
     };
 
     startTransition(async () => {
@@ -282,40 +288,27 @@ export function RegisterForm() {
         </summary>
         <div className="mt-3 space-y-4 pl-1">
           <div className="grid grid-cols-2 gap-4">
-            <div className="space-y-1.5">
-              <label htmlFor="admissionYear" className="text-xs text-zinc-400">Admission Year</label>
-              <input
-                id="admissionYear"
-                name="admissionYear"
-                type="number"
-                disabled={isPending}
-                placeholder="e.g. 2022"
-                className="w-full rounded-lg border border-zinc-700 bg-zinc-800/50 px-3 py-2 text-sm text-zinc-100 placeholder:text-zinc-500 focus:border-indigo-500 focus:outline-none focus:ring-1 focus:ring-indigo-500 transition-all disabled:opacity-50"
-              />
-            </div>
-            <div className="space-y-1.5">
-              <label htmlFor="graduationYear" className="text-xs text-zinc-400">Graduation Year</label>
-              <input
-                id="graduationYear"
-                name="graduationYear"
-                type="number"
-                disabled={isPending}
-                placeholder="e.g. 2026"
-                className="w-full rounded-lg border border-zinc-700 bg-zinc-800/50 px-3 py-2 text-sm text-zinc-100 placeholder:text-zinc-500 focus:border-indigo-500 focus:outline-none focus:ring-1 focus:ring-indigo-500 transition-all disabled:opacity-50"
-              />
-            </div>
-          </div>
-          <div className="space-y-1.5">
-            <label htmlFor="branch" className="text-xs text-zinc-400">Branch</label>
-            <input
-              id="branch"
-              name="branch"
-              type="text"
+            <BatchSelect
+              mode="admission"
+              value={admissionYear}
+              onChange={setAdmissionYear}
               disabled={isPending}
-              placeholder="e.g. Computer Science"
-              className="w-full rounded-lg border border-zinc-700 bg-zinc-800/50 px-3 py-2 text-sm text-zinc-100 placeholder:text-zinc-500 focus:border-indigo-500 focus:outline-none focus:ring-1 focus:ring-indigo-500 transition-all disabled:opacity-50"
+              variant="dark"
+            />
+            <BatchSelect
+              mode="graduation"
+              value={graduationYear}
+              onChange={setGraduationYear}
+              disabled={isPending}
+              variant="dark"
             />
           </div>
+          <BranchSelect
+            value={branch}
+            onChange={setBranch}
+            disabled={isPending}
+            variant="dark"
+          />
         </div>
       </details>
 

@@ -2,6 +2,7 @@
 
 import { ExternalLink, AlertTriangle } from "lucide-react";
 import { PublicStudentProfileDTO } from "@/types/profile";
+import { normalizeBranch } from "@/lib/constants/branches";
 
 interface ProfileHeaderProps {
   profile: PublicStudentProfileDTO;
@@ -9,7 +10,7 @@ interface ProfileHeaderProps {
 
 export function ProfileHeader({ profile }: ProfileHeaderProps) {
   const academicDetails = [
-    profile.branch ? profile.branch.toUpperCase() : null,
+    normalizeBranch(profile.branch),
     profile.graduationYear ? `Class of ${profile.graduationYear}` : null,
   ]
     .filter(Boolean)

@@ -5,6 +5,7 @@ import Link from "next/link";
 import { Info, ExternalLink, Star, Trophy, Flame } from "lucide-react";
 import { LeaderboardRowDTO } from "@/types/leaderboard";
 import { RankingFormulaModal } from "@/components/leaderboard/RankingFormulaModal";
+import { normalizeBranch } from "@/lib/constants/branches";
 
 interface LeaderboardRowProps {
   row: LeaderboardRowDTO;
@@ -16,7 +17,7 @@ export function LeaderboardRow({ row, isCurrentUser = false }: LeaderboardRowPro
 
   const academicDetails = [
     row.graduationYear ? `Batch ${row.graduationYear}` : null,
-    row.branch ? row.branch.toUpperCase() : null,
+    normalizeBranch(row.branch),
     `@${row.leetcodeUsername}`,
   ]
     .filter(Boolean)

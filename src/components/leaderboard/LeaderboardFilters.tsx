@@ -1,32 +1,15 @@
 "use client";
 
-import { useState, useTransition } from "react";
+import { useState, useTransition, useEffect } from "react";
 import { useRouter, usePathname, useSearchParams } from "next/navigation";
 import { Search, RotateCcw, ChevronDown, SlidersHorizontal, X } from "lucide-react";
 import { LeaderboardFilterParams } from "@/types/leaderboard";
+import { BRANCH_FILTER_OPTIONS } from "@/lib/constants/branches";
+import { BATCH_FILTER_OPTIONS } from "@/lib/constants/batches";
 
 interface LeaderboardFiltersProps {
   currentFilters: LeaderboardFilterParams;
 }
-
-const COMMON_BRANCHES = [
-  { value: "ALL", label: "All Engineering Branches" },
-  { value: "CSE", label: "Computer Science (CSE)" },
-  { value: "IT", label: "Information Tech (IT)" },
-  { value: "ECE", label: "Electronics (ECE)" },
-  { value: "MECH", label: "Mechanical (MECH)" },
-  { value: "CIVIL", label: "Civil Engineering" },
-  { value: "EE", label: "Electrical (EE)" },
-];
-
-const COMMON_BATCHES = [
-  { value: "ALL", label: "All Batches" },
-  { value: "2024", label: "Class of 2024" },
-  { value: "2025", label: "Class of 2025" },
-  { value: "2026", label: "Class of 2026" },
-  { value: "2027", label: "Class of 2027" },
-  { value: "2028", label: "Class of 2028" },
-];
 
 export function LeaderboardFilters({ currentFilters }: LeaderboardFiltersProps) {
   const router = useRouter();
@@ -35,6 +18,11 @@ export function LeaderboardFilters({ currentFilters }: LeaderboardFiltersProps) 
   const [isPending, startTransition] = useTransition();
   const [search, setSearch] = useState(currentFilters.search || "");
   const [isMobileOpen, setIsMobileOpen] = useState(false);
+
+  // Keep search input in sync when URL param changes externally (e.g. reset, back/forward)
+  useEffect(() => {
+    setSearch(currentFilters.search || "");
+  }, [currentFilters.search]);
 
   const updateUrl = (updates: Record<string, string | null>) => {
     const params = new URLSearchParams(searchParams.toString());
@@ -177,7 +165,7 @@ export function LeaderboardFilters({ currentFilters }: LeaderboardFiltersProps) 
                 isBranchActive ? "border-blue-500 bg-blue-50/20 dark:bg-blue-950/40 text-blue-900 dark:text-blue-300" : "border-slate-200 dark:border-slate-700"
               }`}
             >
-              {COMMON_BRANCHES.map((b) => (
+              {BRANCH_FILTER_OPTIONS.map((b) => (
                 <option key={b.value} value={b.value} className="bg-white dark:bg-slate-900 text-slate-900 dark:text-white">
                   {b.label}
                 </option>
@@ -200,7 +188,7 @@ export function LeaderboardFilters({ currentFilters }: LeaderboardFiltersProps) 
                 isBatchActive ? "border-blue-500 bg-blue-50/20 dark:bg-blue-950/40 text-blue-900 dark:text-blue-300" : "border-slate-200 dark:border-slate-700"
               }`}
             >
-              {COMMON_BATCHES.map((b) => (
+              {BATCH_FILTER_OPTIONS.map((b) => (
                 <option key={b.value} value={b.value} className="bg-white dark:bg-slate-900 text-slate-900 dark:text-white">
                   {b.label}
                 </option>

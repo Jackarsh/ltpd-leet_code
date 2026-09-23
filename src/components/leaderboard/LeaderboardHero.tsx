@@ -13,7 +13,10 @@ interface LeaderboardHeroProps {
 
 export function LeaderboardHero({ topStudent, totalCoders }: LeaderboardHeroProps) {
   return (
-    <div className="relative overflow-hidden bg-[#0b132b] text-white border-b border-white/10 shadow-lg">
+    <div
+      className="relative overflow-hidden text-white border-b border-white/10 shadow-lg"
+      style={{ background: "linear-gradient(135deg, #0c2461 0%, #1a3a8f 60%, #1e4db7 100%)" }}
+    >
       <div className="mx-auto max-w-7xl px-4 sm:px-6 lg:px-8 py-8 sm:py-12">
         <div className="grid grid-cols-1 lg:grid-cols-12 gap-8 items-center">
           {/* Left Column: Interactive Glitching CodeRank Title */}

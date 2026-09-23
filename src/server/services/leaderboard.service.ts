@@ -2,6 +2,7 @@ import { db } from '@/lib/db';
 import { isDataStale } from '@/server/services/leetcode/sync.service';
 import { calculateCurrentStreak, isUserActive } from '@/lib/activity-utils';
 import { computeStudentScoreBreakdown } from '@/server/services/ranking.service';
+import { normalizeBranch } from '@/lib/constants/branches';
 import {
   LeaderboardFilterParams,
   LeaderboardResponseDTO,
@@ -21,7 +22,10 @@ export async function getLeaderboardData(
     profileWhere.gender = params.gender;
   }
   if (params.branch && params.branch.trim() !== '' && params.branch !== 'ALL') {
-    profileWhere.branch = { equals: params.branch.trim(), mode: 'insensitive' };
+    // ponytail: DB-level filter omitted for branch since legacy abbreviated values
+    // (e.g. "CSE") won't match full-name queries. The accurate in-memory filter
+    // below handles this using normalizeBranch(). Fetching slightly more rows is
+    // acceptable given the dataset size.
   }
   if (params.batch && params.batch !== 'ALL') {
     const batchYear = Number(params.batch);
@@ -170,11 +174,12 @@ export async function getLeaderboardData(
     });
   }
 
-  // Branch filter (case-insensitive) - FR-223
+  // Branch filter — normalize both sides so legacy abbreviated values (e.g. "CSE")
+  // and new full-name values (e.g. "Computer Science and Engineering") both match.
   if (params.branch && params.branch.trim() !== '' && params.branch !== 'ALL') {
-    const branchTarget = params.branch.trim().toLowerCase();
+    const branchTarget = normalizeBranch(params.branch)?.toLowerCase();
     filtered = filtered.filter(
-      (row) => row.branch && row.branch.toLowerCase() === branchTarget
+      (row) => normalizeBranch(row.branch)?.toLowerCase() === branchTarget
     );
   }
 

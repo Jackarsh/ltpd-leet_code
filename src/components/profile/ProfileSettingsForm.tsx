@@ -4,6 +4,9 @@ import React, { useState, useTransition } from "react";
 import { updateProfile } from "@/server/actions/update-profile";
 import { changeEmail } from "@/server/actions/change-email";
 import { GenderSelect } from "@/components/ui/GenderSelect";
+import { BranchSelect } from "@/components/ui/BranchSelect";
+import { BatchSelect } from "@/components/ui/BatchSelect";
+import { normalizeBranch } from "@/lib/constants/branches";
 import { Loader2, Save, Mail } from "lucide-react";
 
 interface ProfileSettingsFormProps {
@@ -25,6 +28,15 @@ export function ProfileSettingsForm({ initialData }: ProfileSettingsFormProps) {
   const [success, setSuccess] = useState<string | null>(null);
   const [gender, setGender] = useState(initialData.gender);
 
+  // Controlled state for dropdown fields — normalise legacy branch abbreviation
+  const [branch, setBranch] = useState(normalizeBranch(initialData.branch) ?? "");
+  const [admissionYear, setAdmissionYear] = useState(
+    initialData.admissionYear != null ? String(initialData.admissionYear) : ""
+  );
+  const [graduationYear, setGraduationYear] = useState(
+    initialData.graduationYear != null ? String(initialData.graduationYear) : ""
+  );
+
   const [isEmailPending, startEmailTransition] = useTransition();
   const [emailSuccess, setEmailSuccess] = useState<string | null>(null);
   const [emailError, setEmailError] = useState<string | null>(null);
@@ -40,9 +52,9 @@ export function ProfileSettingsForm({ initialData }: ProfileSettingsFormProps) {
       displayName: formData.get("displayName") as string,
       gender,
       leetcodeUsername: formData.get("leetcodeUsername") as string,
-      admissionYear: formData.get("admissionYear") ? Number(formData.get("admissionYear")) : null,
-      graduationYear: formData.get("graduationYear") ? Number(formData.get("graduationYear")) : null,
-      branch: (formData.get("branch") as string) || null,
+      admissionYear: admissionYear ? Number(admissionYear) : null,
+      graduationYear: graduationYear ? Number(graduationYear) : null,
+      branch: branch || null,
       bio: (formData.get("bio") as string) || null,
     };
 
@@ -77,25 +89,28 @@ export function ProfileSettingsForm({ initialData }: ProfileSettingsFormProps) {
     });
   };
 
-  const inputCls = "w-full rounded-md border border-[#30363d] bg-[#0d1117] px-3.5 py-2 text-xs text-[#e6edf3] placeholder-[#6e7681] focus:border-[#484f58] focus:outline-none transition-colors disabled:opacity-50";
+  const inputCls =
+    "w-full rounded-md border border-slate-200 dark:border-[#30363d] bg-white dark:bg-[#0d1117] px-3.5 py-2 text-xs text-slate-900 dark:text-[#e6edf3] placeholder-slate-400 dark:placeholder-[#6e7681] focus:border-blue-500 dark:focus:border-[#484f58] focus:outline-none transition-colors disabled:opacity-50";
 
   return (
     <div className="space-y-6">
       {/* Profile Information */}
-      <div className="rounded-xl border border-[#30363d] bg-[#161b22] p-5 space-y-4">
-        <h2 className="text-sm font-semibold text-[#e6edf3] border-b border-[#21262d] pb-3">
-          Academic & Personal Profile
+      <div className="rounded-xl border border-slate-200 dark:border-[#30363d] bg-white dark:bg-[#161b22] p-5 space-y-4">
+        <h2 className="text-sm font-semibold text-slate-900 dark:text-[#e6edf3] border-b border-slate-100 dark:border-[#21262d] pb-3">
+          Academic &amp; Personal Profile
         </h2>
 
         <form onSubmit={handleProfileSubmit} className="space-y-4">
           {success && (
-            <div className="rounded-lg bg-[#21262d] border border-[#238636]/40 p-3 text-xs text-[#3fb950]">
+            <div className="rounded-lg bg-emerald-50 dark:bg-[#21262d] border border-emerald-200 dark:border-[#238636]/40 p-3 text-xs text-emerald-700 dark:text-[#3fb950]">
               {success}
             </div>
           )}
 
           <div className="space-y-1.5">
-            <label htmlFor="displayName" className="text-xs font-medium text-[#848d97]">Display Name</label>
+            <label htmlFor="displayName" className="text-xs font-medium text-slate-600 dark:text-[#848d97]">
+              Display Name
+            </label>
             <input
               id="displayName"
               name="displayName"
@@ -103,11 +118,13 @@ export function ProfileSettingsForm({ initialData }: ProfileSettingsFormProps) {
               disabled={isPending}
               className={inputCls}
             />
-            {errors.displayName && <p className="text-xs text-[#f85149]">{errors.displayName[0]}</p>}
+            {errors.displayName && <p className="text-xs text-rose-500 dark:text-[#f85149]">{errors.displayName[0]}</p>}
           </div>
 
           <div className="space-y-1.5">
-            <label htmlFor="leetcodeUsername" className="text-xs font-medium text-[#848d97]">LeetCode Username</label>
+            <label htmlFor="leetcodeUsername" className="text-xs font-medium text-slate-600 dark:text-[#848d97]">
+              LeetCode Username
+            </label>
             <input
               id="leetcodeUsername"
               name="leetcodeUsername"
@@ -115,52 +132,39 @@ export function ProfileSettingsForm({ initialData }: ProfileSettingsFormProps) {
               disabled={isPending}
               className={inputCls}
             />
-            {errors.leetcodeUsername && <p className="text-xs text-[#f85149]">{errors.leetcodeUsername[0]}</p>}
+            {errors.leetcodeUsername && <p className="text-xs text-rose-500 dark:text-[#f85149]">{errors.leetcodeUsername[0]}</p>}
           </div>
 
           <GenderSelect value={gender} onChange={setGender} error={errors.gender?.[0]} disabled={isPending} />
 
+          {/* Batch year dropdowns (T017) */}
           <div className="grid grid-cols-2 gap-4">
-            <div className="space-y-1.5">
-              <label htmlFor="admissionYear" className="text-xs font-medium text-[#848d97]">Admission Year</label>
-              <input
-                id="admissionYear"
-                name="admissionYear"
-                type="number"
-                defaultValue={initialData.admissionYear ?? ""}
-                disabled={isPending}
-                placeholder="e.g. 2022"
-                className={inputCls}
-              />
-            </div>
-            <div className="space-y-1.5">
-              <label htmlFor="graduationYear" className="text-xs font-medium text-[#848d97]">Graduation Year</label>
-              <input
-                id="graduationYear"
-                name="graduationYear"
-                type="number"
-                defaultValue={initialData.graduationYear ?? ""}
-                disabled={isPending}
-                placeholder="e.g. 2026"
-                className={inputCls}
-              />
-            </div>
-          </div>
-
-          <div className="space-y-1.5">
-            <label htmlFor="branch" className="text-xs font-medium text-[#848d97]">Branch</label>
-            <input
-              id="branch"
-              name="branch"
-              defaultValue={initialData.branch ?? ""}
+            <BatchSelect
+              mode="admission"
+              value={admissionYear}
+              onChange={setAdmissionYear}
               disabled={isPending}
-              placeholder="e.g. Computer Science and Engineering"
-              className={inputCls}
+            />
+            <BatchSelect
+              mode="graduation"
+              value={graduationYear}
+              onChange={setGraduationYear}
+              disabled={isPending}
             />
           </div>
 
+          {/* Branch dropdown (T015) — legacy values normalised via normalizeBranch in state init */}
+          <BranchSelect
+            value={branch}
+            onChange={setBranch}
+            error={errors.branch?.[0]}
+            disabled={isPending}
+          />
+
           <div className="space-y-1.5">
-            <label htmlFor="bio" className="text-xs font-medium text-[#848d97]">Bio</label>
+            <label htmlFor="bio" className="text-xs font-medium text-slate-600 dark:text-[#848d97]">
+              Bio
+            </label>
             <textarea
               id="bio"
               name="bio"
@@ -176,34 +180,35 @@ export function ProfileSettingsForm({ initialData }: ProfileSettingsFormProps) {
           <button
             type="submit"
             disabled={isPending}
-            className="btn-press rounded-md bg-[#21262d] border border-[#30363d] px-4 py-2 text-xs font-semibold text-[#e6edf3] hover:bg-[#30363d] transition-all disabled:opacity-50 flex items-center gap-2"
+            className="btn-press rounded-md bg-slate-100 dark:bg-[#21262d] border border-slate-200 dark:border-[#30363d] px-4 py-2 text-xs font-semibold text-slate-800 dark:text-[#e6edf3] hover:bg-slate-200 dark:hover:bg-[#30363d] transition-all disabled:opacity-50 flex items-center gap-2"
           >
-            {isPending ? <Loader2 className="h-3.5 w-3.5 animate-spin" /> : <Save className="h-3.5 w-3.5 text-[#848d97]" />}
+            {isPending ? <Loader2 className="h-3.5 w-3.5 animate-spin" /> : <Save className="h-3.5 w-3.5 text-slate-500 dark:text-[#848d97]" />}
             <span>{isPending ? "Saving..." : "Save Profile"}</span>
           </button>
         </form>
       </div>
 
       {/* Account Email & Security */}
-      <div className="rounded-xl border border-[#30363d] bg-[#161b22] p-5 space-y-4">
-        <div className="flex items-center gap-2 border-b border-[#21262d] pb-3">
-          <Mail className="h-4 w-4 text-[#848d97]" />
-          <h2 className="text-sm font-semibold text-[#e6edf3]">Account Email Address</h2>
+      <div className="rounded-xl border border-slate-200 dark:border-[#30363d] bg-white dark:bg-[#161b22] p-5 space-y-4">
+        <div className="flex items-center gap-2 border-b border-slate-100 dark:border-[#21262d] pb-3">
+          <Mail className="h-4 w-4 text-slate-400 dark:text-[#848d97]" />
+          <h2 className="text-sm font-semibold text-slate-900 dark:text-[#e6edf3]">Account Email Address</h2>
         </div>
 
-        <p className="text-xs text-[#848d97]">
-          Current email: <span className="font-semibold text-[#e6edf3]">{initialData.email || "configured"}</span>.
+        <p className="text-xs text-slate-500 dark:text-[#848d97]">
+          Current email:{" "}
+          <span className="font-semibold text-slate-900 dark:text-[#e6edf3]">{initialData.email || "configured"}</span>.{" "}
           Changing your email sends a confirmation link to the new address. Your current email remains active until verified.
         </p>
 
         {emailSuccess && (
-          <div className="rounded-lg bg-[#21262d] border border-[#238636]/40 p-3 text-xs text-[#3fb950]">
+          <div className="rounded-lg bg-emerald-50 dark:bg-[#21262d] border border-emerald-200 dark:border-[#238636]/40 p-3 text-xs text-emerald-700 dark:text-[#3fb950]">
             {emailSuccess}
           </div>
         )}
 
         {emailError && (
-          <div className="rounded-lg bg-[#21262d] border border-[#f85149]/40 p-3 text-xs text-[#f85149]">
+          <div className="rounded-lg bg-rose-50 dark:bg-[#21262d] border border-rose-200 dark:border-[#f85149]/40 p-3 text-xs text-rose-600 dark:text-[#f85149]">
             {emailError}
           </div>
         )}
@@ -221,7 +226,7 @@ export function ProfileSettingsForm({ initialData }: ProfileSettingsFormProps) {
           <button
             type="submit"
             disabled={isEmailPending || !newEmail.trim()}
-            className="btn-press rounded-md bg-[#21262d] border border-[#30363d] px-4 py-2 text-xs font-semibold text-[#e6edf3] hover:bg-[#30363d] transition-all disabled:opacity-50 flex items-center gap-2"
+            className="btn-press rounded-md bg-slate-100 dark:bg-[#21262d] border border-slate-200 dark:border-[#30363d] px-4 py-2 text-xs font-semibold text-slate-800 dark:text-[#e6edf3] hover:bg-slate-200 dark:hover:bg-[#30363d] transition-all disabled:opacity-50 flex items-center gap-2"
           >
             {isEmailPending && <Loader2 className="h-3.5 w-3.5 animate-spin" />}
             <span>{isEmailPending ? "Sending Verification..." : "Update Email"}</span>
