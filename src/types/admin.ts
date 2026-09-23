@@ -5,6 +5,7 @@ export type AdminRole = "PLATFORM_ADMIN" | "SUPER_ADMIN";
 export type AuditActionType =
   | "USER_UPDATE"
   | "USER_STATUS_CHANGE"
+  | "USER_DELETE"
   | "DUPLICATE_RESOLVE"
   | "ACHIEVEMENT_CREATE"
   | "ACHIEVEMENT_UPDATE"
